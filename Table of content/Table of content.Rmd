@@ -1,12 +1,14 @@
 ---
 title: "R教學 – 系列筆記"
 author: "skydome20 (skydome20@gmail.com)"
-date: "2016/09/09(update)"
+date: "2016/11/19(update)"
 output: 
   html_document:
         css: style.css
 ---
-【LinkedIn】 <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>
+【LinkedIn】 <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>   
+
+【GitHub Download】 <a href="https://github.com/skydome20/R-Notes" target="_blank">https://github.com/skydome20/R-Notes</a>
 
 ------
    
