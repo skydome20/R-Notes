@@ -1,0 +1,273 @@
+---
+title: "R筆記--(6)關聯式規則；決策樹(分析鐵達尼號資料)"
+author: "skydome20 (skydome20@gmail.com)"
+date: "2016/04/27"
+output: 
+  html_document:
+        css: style.css
+---
+
+<a href="http://rpubs.com/skydome20/Table_of_Content" target="_blank">【R系列筆記】</a>   
+
+------
+  
+本篇內容，會繼續介紹一些常用的資料探勘模型：   
+   
+------
+   
+#**1. 關聯式規則(Apriori)**   
+   
+這裡拿網路上一個公開資料(鐵達尼號的乘客資料)來進行分析，<a href="http://www.rdatamining.com/data/titanic.raw.rdata?attredirects=0&d=1" target="_blank">資料載點如下</a>。   
+
+下載之後，你會發現資料的型態並非熟悉的.csv。   
+   
+因此我們要用**函式**把資料匯入到R裡面，使用的函式是`load()`：   
+
+```{r}
+# 記得要給定資料所在的路徑(path)，例如：我把下載的資料放在C槽下：
+load("C:/titanic.raw.rdata")  #匯入.rdata檔
+```   
+   
+**(補充：如果我們要匯入.csv檔，除了之前教的方法以外，也可以用函式`read.csv()`)**   
+```{r, eval=FALSE}
+data <- read.csv("C:/data.csv")
+```
+   
+   
+並且用`str()`看這筆資料的狀態
+```{r}
+str(titanic.raw)
+```
+
+可以發現資料裡面有四個欄位：
+
+1. Class：乘客的艙位等級  
+
+2. Sex：乘客性別    
+
+3. Age ：乘客年齡   
+
+4. Survived：沉船之後，乘客是否存活？
+
+   
+關於鐵達尼號的故事，大家應該都耳熟能詳。而當我們說「女性比較容易存活」、以及「男性船員幾乎活不下來」，相信也沒人會反對吧？   
+   
+畢竟電影就是這樣演的嘛！
+
+可是，說歸說，如果要證明的話，該怎麼做呢？   
+
+啊啊啊！腦袋卡住了......   
+
+
+好啦，就不賣關子了。事實上這件事其實並不難，其中一個方法，就是本篇即將用到的第一個方法：**關聯式法則(apriori)**！(對應的套件：`arules`)
+   
+```{r, message=F, warning=F, results='hide'}
+require(arules) # apriori關聯式法則的套件
+
+```
+
+還記得apriori演算法是怎麼運作的嗎？我們需要設定：
+
+* 最小支持度(min support)：「規則」在資料內具有普遍性   
+
+* 最小信賴度(min confidence)：「規則」要有一定的信心水準   
+
+   
+(以上忘記的話，趕緊去讀熟XD)     
+   
+而我們想要探討的規則，形式如下：「在A情況下，會存活與否」   
+   
+換句話說，可以寫成**A => 存活與否**，所以把Survived這個變數放在`=>`的右手邊(right hand side)
+
+```{r, results='hide'}
+# apriori rules with rhs containing "Survived" only
+
+rule <- apriori(titanic.raw, 
+                # min support & confidence, 最小規則長度(lhs+rhs)
+                parameter=list(minlen=3, supp=0.1, conf=0.7),  
+                appearance = list(default="lhs",
+                                  rhs=c("Survived=No", "Survived=Yes") 
+                                  # 右手邊顯示的特徵
+                                  )
+                )  
+```   
+
+要觀察rule需要使用`inspect()`的函式：
+
+```{r}
+inspect(rule)
+```
+   
+根據lift，由大到小排序rule：   
+```{r}
+sort.rule <- sort(rule, by="lift")
+inspect(sort.rule)
+```
+
+看第一個關聯規則：「若身分是成人女性 => 則會存活」，lift=2.3 > 1，表示預測結果比原本表現好。   
+
+然而，有發現到問題嗎？   
+   
+第六個關聯規則(#編號8)「若身分是男性成人船員 => 不會存活」，對比於第五個關聯規則(#編號4)：「若身分是男性船員 => 不會存活」，其實看不到任何有用的資訊！   
+   
+而且，第六個規則的lift <= 第五個規則的lift，   當發生這樣的情況時，我們就可以說：第六個關聯規則是**多餘的(redundant)**。   
+   
+多餘的關聯法則，會造成分析上的雜訊，因此需要刪除它們，但該怎麼做呢？   
+   
+首先，先看某項規則是否為其他規則的子集(subset)：
+```{r}
+subset.matrix <- is.subset(x=sort.rule, y=sort.rule)
+```
+輸出的格式會像這樣：
+
+<img src="2.png" />   
+
+上面的結果要解釋很簡單：在X的項目，如果是Y項目的子集(subset)，就會回傳TRUE。   
+(當你用RStudio打開**subset.matrix**這個變數時，會看見一個8x8的矩陣)
+
+之後再進行以下步驟：
+```{r}
+# 把這個矩陣的下三角去除，只留上三角的資訊
+subset.matrix[lower.tri(subset.matrix, diag=T)] <- NA
+
+# 計算每個column中TRUE的個數，若有一個以上的TRUE，代表此column是多餘的
+redundant <- colSums(subset.matrix, na.rm=T) >= 1
+
+# 移除多餘的規則
+sort.rule <- sort.rule[!redundant]
+
+inspect(sort.rule)
+```
+經過以上步驟後，多餘的規則消失了！   
+
+在R裡面，關聯式規則還提供一個視覺化的套件`arulesViz`，可以觀察每條規則的三項指標分布情況：
+
+```{r,message=F, warning=F }
+require(arulesViz)
+plot(sort.rule)
+```
+
+而且也可以將規則視覺化，知道當初災難發生以後，在什麼樣的條件下比較容易存活/死亡：
+```{r}
+plot(sort.rule, method="graph", control=list(type="items"))
+plot(sort.rule, method="grouped")
+```
+
+現在對照一開始的假設：**「女性比較容易存活」、「男性船員幾乎死光光」**...嗯嗯嗯(點頭)！   
+
+不同的是，現在你的手上已經有證據了！因此下次跟別人一起看鐵達尼號時，就大方地拿來說嘴吧！   
+
+   
+------
+   
+#**2. 決策樹(Decision Tree)**   
+
+無論在分類或預測上，決策樹的演算法都有很好的效果。   
+   
+但它最強大的地方，莫過於樹狀分支的結構：可以明顯呈現分類的規則！與一些機器學習的方法(NN, SVM...)相比，相當容易進行解釋，以及分析規則之間的關係。   
+
+這裡就簡單用CART決策樹來練習，對應的套件是`rpart`，一樣使用剛才鐵達尼號的資料：
+```{r, message=F,warning=F}
+require(rpart)
+
+# 先把資料區分成 train=0.8, test=0.2 
+set.seed(22)
+train.index <- sample(x=1:nrow(titanic.raw), size=ceiling(0.8*nrow(titanic.raw) ))
+train <- titanic.raw[train.index, ]
+test <- titanic.raw[-train.index, ]
+
+# CART的模型：把存活與否的變數(Survived)當作Y，剩下的變數當作X
+cart.model<- rpart(Survived ~. , 
+                    data=train)
+```   
+
+要畫出決策樹(視覺化)，雖然用平常的`plot()`就可以達成   
+   
+但rpart有專屬的繪圖套件`rpart.plot`，函式是`prp()`   
+   
+說真的，用`prp()`畫出來的決策樹，比較好看一些：
+
+```{r, message=F,warning=F}
+require(rpart.plot)	
+prp(cart.model,         # 模型
+    faclen=0,           # 呈現的變數不要縮寫
+    fallen.leaves=TRUE, # 讓樹枝以垂直方式呈現
+    shadow.col="gray",  # 最下面的節點塗上陰影
+    # number of correct classifications / number of observations in that node
+    extra=2)  
+```   
+   
+(最下面節點的數字，代表：**number of correct classifications / number of observations in that node**)   
+   
+根據以上決策樹，可以發現**是男生或女生**其實很重要(因為是第一個分支規則)，其次是在船上的艙位等級。   
+   
+因此，我們可以這樣解釋：   
+
+```
+即使是女性，可是擁有的艙位若是最低下的(3rd)，則大概有一半的死亡機率(82/155=53%)；   
+但當妳的艙位高人一等時，則有相當高的存活機率(197/208=95%)。  
+```    
+
+又或者是：   
+
+```
+當你是男性成人時，大概有八成機率會死(1084/1348=80%)，合理推測剩下兩成是貴族(?)   
+```   
+
+以及
+
+```
+若是男性小孩，就和艙位等級有關：高級艙位的小孩全都獲救(13/13)，可是低艙位的小孩有七成機率(26/37)會死。  
+```   
+
+**(OS：男生好可憐QHQ 這個社會好現實QHQ)**   
+
+------
+   
+有決策樹之後，就要進行預測啦！   
+   
+還記得在線性迴歸使用過的`predict()`嗎？這時就會派上用場囉(在這裡，會同時計算預測準確率)：    
+   
+```{r}
+pred <- predict(cart.model, newdata=test, type="class")
+
+# 用table看預測的情況
+table(real=test$Survived, predict=pred)
+
+# 計算預測準確率 = 對角線的數量/總數量
+confus.matrix <- table(real=test$Survived, predict=pred)
+sum(diag(confus.matrix))/sum(confus.matrix) # 對角線的數量/總數量
+```
+   
+------
+   
+#**總結**  
+
+和一些機器學習方法只會專注在「預測準確率」的概念不太一樣，，關聯式法則和決策樹在「解釋」上具有十分強大的優勢。   
+
+的確，在現實中，有時候確實只要「高的預測準確率」的模型，就可以達成許多目標。    
+   
+可是也千萬別忘記了，我們正在進行的是「資料分析」，也就是去「解釋」資料中的故事。   
+   
+事實上，有時候這個步驟反而會比「準確率」還重要。這一點，稍微思考一下就能理解了：唯有去探討資料的故事，才有機會發現到**有趣的跡象、失敗的原因、違背直覺的現象......**等等。   
+
+而且，這樣才有一種......真正在進行「資料分析」的感覺，不是嗎？   
+
+It's still a long way to go~   
+
+------
+   
+#**Reference**  
+
+<a href="http://www.rdatamining.com/examples/association-rules
+" target="_blank">http://www.rdatamining.com/examples/association-rules
+</a>   
+   
+
+<a href="https://www.kaggle.com/c/titanic
+" target="_blank">https://www.kaggle.com/c/titanic
+</a>   
+
+
+
+

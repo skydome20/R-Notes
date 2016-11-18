@@ -1,0 +1,144 @@
+---
+title: "R筆記--(10)遺漏值處理(Missing Value)"
+author: "skydome20 (skydome20@gmail.com)"
+date: "2016/06/06"
+output: 
+  html_document:
+        css: style.css
+---
+
+<a href="http://rpubs.com/skydome20/Table_of_Content" target="_blank">【R系列筆記】</a>  
+
+------
+  
+前面幾篇，介紹了一些常用的資料探勘模型。   
+
+不過本篇內容比較不太一樣，比較著重在「資料預處理」(或者稱**資料清洗**)的手法上。    
+
+畢竟在資料分析的流程中，其實有60~70%的時間是在進行「資料預處理」。如果沒有好的資料，後續的分析其實就可能會有很大的偏誤。   
+
+在「資料預處理」時，我們時常會遇到很多問題需要解決。當然，也有有很多對應的小技巧，可以幫助我們處理這些問題。   
+
+而本篇內容，主要針對一個比較重要問題：**遺漏值(Missing Value)**，進行處理！   
+
+在R裡面，遺漏值會被表現成**NA(not available)**，而我們可以使用`is.na()`的函式，確認資料中是否有遺漏值的存在：   
+
+
+```{r}
+tmp <- c(1,5,8,NA,5,NA,6)
+is.na(tmp)
+
+# 計算遺漏值的個數
+sum(is.na(tmp))
+```      
+
+在R裡面處理遺漏值時，最常使用的就是`mice`套件，其全名為**Multivariate Imputation via Chained Equations**，裡面會運用資料探勘的方法，針對遺漏值進行「模擬填值」的動作。   
+
+
+```{r, message=FALSE}
+require(mice)
+```   
+
+我們一樣使用`iris`的資料集，並且讓資料中隨機產生遺漏值，來練習之後介紹的處理手法：   
+
+```{r, message=FALSE}
+require(missForest) # prodNA() function
+
+# 在iris資料內，隨機產生10%的遺漏值
+data <- prodNA(iris, noNA = 0.1)
+head(data)
+```   
+
+
+------
+  
+
+一般來說，在處理遺漏值時有以下手法：
+
+## 1. 直接移除有遺漏值的資料   
+
+```{r}
+# 當一筆資料是完整的，回傳TRUE；當一筆資料有遺漏值，回傳FALSE
+complete.cases(data)
+
+# 移除有遺漏值的資料
+rm.data <- data[complete.cases(data), ]
+```
+
+可是這麼做不太好，因為會造成資訊損失(information loss)。   
+
+所以我們常會採取「填補遺漏值」的手法，也就是下面即將介紹的！   
+
+------
+  
+
+##2. 用「平均數」、「第一四分位數」...來填補遺漏值：   
+
+
+```{r}
+# 以下用平均數，來填補某一欄位的遺漏值
+mean.data <- data
+
+mean.1 <- mean(mean.data[, 1], na.rm = T)  # 第一欄位的平均數
+na.rows <- is.na(mean.data[, 1])           # 第一欄位中，有遺漏值存在的資料
+
+# 用第一欄位的平均數，填補第一欄位的遺漏值
+mean.data[na.rows, 1] <- mean.1
+```
+
+------
+  
+
+##3. 用MICE填補遺漏值：   
+
+在MICE裡面，提供了很多資料探勘的模型(linear regression, logistic regression, cart, random forest, boostrap......)，來針對遺漏值進行預測！   
+
+概念很簡單：現在我們有欄位V1,V2,V3......Vn，每個欄位裡面都有遺漏值。   
+
+當我們要填補V1的遺漏值時，就先把V2,V3......Vn的欄位當作自變數(X)，把V1當作應變數(Y)，並且進行建模，然後用預測的結果來填補V1的遺漏值。   
+
+同理，針對V2，就用V1,V3......Vn建模，然後用預測的結果來填補V2的遺漏值。     
+
+(由於這個函式，背後有使用Gibbs sampling(一種抽樣手法)。所以，即使使用某個模型進行遺漏值填補，也會因為抽樣手法，造成最後填補的結果有些許不同)   
+
+```{r, results='hide'}
+mice.data <- mice(data,
+                  m = 3,           # 產生三個被填補好的資料表
+                  maxit = 50,      # max iteration
+                  method = "cart", # 使用CART決策樹，進行遺漏值預測
+                  seed = 188)      # set.seed()，令抽樣每次都一樣
+
+# 原始資料(有遺漏值)
+data
+
+# 填補好的資料：因為m=3，所以會有三個填補好的資料集，可以用以下方式取出
+
+complete(mice.data, 1) # 1st data
+complete(mice.data, 2) # 2nd data
+complete(mice.data, 3) # 3rd data
+```
+(由於上面資料集龐大，故在此不顯示出來！)   
+
+現在，我們可以任取其中一個「填補好的資料」，來進行後續的建模了！   
+
+```{r, results='hide'}
+# e.g. 拿第二個資料，作為我後續分析的資料
+df <- complete(mice.data, 2)
+
+# 然後以df進行線性迴歸、類神經網路、主成份分析...等等
+
+```
+   
+------   
+
+   
+#**總結**    
+
+在資料預處理時，「遺漏值處理」是很重要的步驟，最好還是選擇「填補遺漏值」的方式，才不會造成資訊損失。   
+
+在R裡面，其實有提供很多強大的套件，可以幫我們處理遺漏值！   
+
+本篇只簡單介紹`mice`套件，網路上有神人整理出**五種處理遺漏值的強大套件**，裡面都有詳細的範例：<a href="http://www.analyticsvidhya.com/blog/2016/03/tutorial-powerful-packages-imputing-missing-values/" target="_blank">Tutorial on 5 Powerful R Packages used for imputing missing values</a>，有興趣的話可以參考！      
+
+
+It's still a long way to go~   

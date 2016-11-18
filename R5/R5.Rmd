@@ -1,0 +1,327 @@
+---
+title: "R筆記--(5)初聲試啼-簡單的資料分析(迴歸分析)"
+author: "skydome20 (skydome20@gmail.com)"
+date: "2016/04/08"
+output: 
+  html_document:
+        css: style.css
+---
+
+<a href="http://rpubs.com/skydome20/Table_of_Content" target="_blank">【R系列筆記】</a>   
+   
+------
+  
+到現在，你已經學到許多R的技巧了。可是學習歸學習，有時候如果沒有實際去操作體會，其效果僅止於「知道」而已，並沒有達到「運用」的境界。   
+   
+因此，這裡將會運用之前筆記中提到過的技巧(以及介紹新技巧)，進行一次簡單、完整的資料分析，帶大家體會整個資料探勘的流程。
+   
+------
+   
+#**1. 資料集**   
+   
+這裡使用的資料，是R內建的鳶尾花(iris)資料(來自於`datasets`套件)。   
+   
+先用`str()`和`head()`，查看資料裡面的狀態：
+
+```{r}
+require(datasets)  # source package
+str(iris)          # check structure of iris
+head(iris, n=6)
+```
+
+不難看出，iris的資料筆數為150筆，共有五個欄位：  
+
+1. 花萼長度(Sepal.Length)：計算單位是公分。(連續)    
+
+2. 花萼寬度(Sepal.Width)：計算單位是公分。(連續)     
+
+3. 花瓣長度(Petal.Length) ：計算單位是公分。(連續)    
+
+4. 花瓣寬度(Petal.Width)：計算單位是公分。(連續)     
+
+5. 品種(Species)：可分為Setosa，Versicolor和Virginica。(類別)   
+   
+   
+此外也可以用`summary()`，看各個欄位的基本統計資訊：   
+```{r}
+summary(iris)
+```
+   
+------
+   
+#**2. 繪圖**   
+
+在進行資料分析之前，先仔細觀察資料，看看能不能從裡面找到一些隱藏資訊。   
+   
+例如，花萼長度(Sepal.Length)和花萼寬度(Sepal.Width)，既然都是花萼，可能會有相關，於是畫圖來看看：
+
+```{r, message=F}
+#*** 附上三種繪圖系統的程式碼，以ggplot2輸出 ***#
+
+### Base Plotting System ###
+  #  plot(x=iris$Sepal.Length, y=iris$Sepal.Width,pch=2)
+
+### Lattice ###
+  #  require(lattice)
+  #  xyplot(Sepal.Width~Sepal.Length, data=iris)
+
+### ggplot2 ###
+  require(ggplot2)
+  ggplot(data=iris) +
+    geom_point(aes(x=Sepal.Length,
+                   y=Sepal.Width)) +
+    theme_bw() 
+```   
+   
+嗯...好像看不出什麼東西？   
+   
+那試試看花瓣長度(Sepal.Length)和花瓣寬度(Sepal.Width)：
+
+```{r, message=F}
+#*** 附上三種繪圖系統的程式碼，以ggplot2輸出 ***#
+
+### Base Plotting System ###
+  #  plot(x=iris$Petal.Length, y=iris$Petal.Width,pch=16)
+
+### Lattice ###
+  #  require(lattice)
+  #  xyplot(Petal.Width~Petal.Length, data=iris)
+
+### ggplot2 ###
+  require(ggplot2)
+  ggplot(data=iris) +                        # 準備畫布
+    geom_point(aes(x=Petal.Length,           # 散布圖
+                   y=Petal.Width)) +
+    theme_bw()                               # 改變主題背景成白色
+```   
+   
+Bingo，可以觀察出來，花瓣長度和寬度之間，存在著線性關係，而且明顯分成兩群(左下角和右上角)，推測可能和種類(Species)有關，左下角的資料可能是屬於同一種類的鳶尾花。   
+
+為了確認這一點，我們在上面那張圖標上顏色：   
+   
+```{r, message=F}
+#*** 附上三種繪圖系統的程式碼，以ggplot2輸出 ***#
+
+### Base Plotting System ###
+  #  plot(x=iris$Petal.Length, y=iris$Petal.Width,pch=16)
+  #  d1 <- iris[iris$Species=="versicolor", ]
+  #  points(x=d1$Petal.Length, y=d1$Petal.Width,pch=16, col="green")
+  #  d2 <- iris[iris$Species=="setosa", ]
+  #  points(x=d2$Petal.Length, y=d2$Petal.Width,pch=16, col="red")
+  #  d3 <- iris[iris$Species=="virginica", ]
+  #  points(x=d3$Petal.Length, y=d3$Petal.Width,pch=16, col="blue")
+  #  legend("topleft", pch=16
+  #         legend=c("setosa","versicolor","virginica"), 
+  #         col=c("red", "green", "blue")
+  #        )
+
+  
+### Lattice ###
+  # require(lattice)
+  # xyplot(Petal.Width~Petal.Length, 
+  #        data=iris, 
+  #        pch=16,
+  #        group=Species, 
+  #        auto.key=list(space="top",
+  #                      columns=3, 
+  #                      cex.title=1, 
+  #                      title="Species Labels",
+  #                      pch=16)  
+  #       )
+  
+### ggplot2 ###
+  require(ggplot2)
+  ggplot(data=iris) +                        # 準備畫布
+    geom_point(aes(x=Petal.Length,           # 散布圖
+                   y=Petal.Width,
+                   color=Species)) +         # 把不同品種的資料標上顏色
+    
+    theme_bw()                               # 改變主題背景成白色
+```
+   
+並且看不同種類的鳶尾花，長度和寬度的盒鬚圖：   
+     
+```{r, message=F, warning=F}
+#*** 附上三種繪圖系統的程式碼，以ggplot2輸出 ***#  
+  
+### Base Plotting System ###
+    # boxplot(Petal.Length~Species, data=iris, xlab="Species", ylab="Petal.Length")
+    # boxplot(Petal.Width~Species, data=iris, xlab="Species", ylab="Petal.Length")
+    
+  
+### Lattice ###
+  # require(lattice)
+  # bwplot(x = Petal.Length~Petal.Width | Species, data = iris)
+
+### ggplot2 ###
+  require(ggplot2)
+  qplot(x=Petal.Length,      
+        y=Petal.Width, 
+        data=iris, 
+        geom="boxplot",    # graph type is boxplot
+        color=Species)
+```
+   
+------
+   
+
+#**3. 資料預處裡**   
+資料探勘的分析過程中，「資料預處理」往往是最花時間的(佔整個流程的70~80%)。   
+   
+根據不同的資料，預處理手法也會不一樣(改變結構、類別轉啞變數、正規化...)，而在預處理之中，最常見的莫過於「遺漏值的處理」！   
+   
+要用R檢查資料裡是否有遺漏值的存在，需要使用`is.na()`的函式：
+```{r}
+data <- data.frame(x=c(1,2,3,NA,5),
+                   y=c(4,5,3,NA,NA))
+data  
+is.na(data)        # 遺漏值的地方，標註為TRUE (TRUE/FALSE矩陣的型態)
+table(is.na(data)) # 資料中總共有多少個遺漏值  
+```
+有遺漏值的資料會影響分析結果，因此我們會採取一些手段，主要可以分為兩類「移除有遺漏值的資料」、「填補遺漏值」：
+```{r, results="hide"}
+# 移除有遺漏值的資料，以下兩種方法都可以 #
+data[complete.cases(data), ] # 1.使用 complete.cases() 
+na.omit(data)                # 2.或是使用 na.omit()
+```
+
+```{r}
+# 填補遺漏值(用平均數填值) #
+data[is.na(data[,"y"]), "y"] <- mean(data[,"y"], na.rm=T)
+data
+```
+   
+現在回到iris的資料，檢查看看裡面有沒有遺漏值：   
+
+```{r}
+table(is.na(iris))
+```
+...看來十分完美，沒有遺漏值，所以讓我們繼續下去吧！   
+   
+      
+------
+   
+   
+#**4. 迴歸分析**   
+回歸分析是以一個或一組自變數（解釋變數、預測變項，Xi），來預測一個數值性的因變數（依變數、應變數、被預測變項，Y）。   
+   
+相信大家都知道，簡單迴歸表示只有一個Y；複回歸則允許多個Y存在。
+
+要在R跑線性回歸的模型，要使用函式`lm()`(Linear Model)： **model = lm(Y ~ X1+X2+…+Xk, data=…)**    
+   
+在這裡，我們以Sepal.Length為依變數(Y)，以Sepal.Width、Petal.Length、Petal.Width為自變數(X)，進行迴歸分析：
+
+```{r}
+model <- lm(formula= Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+            data=iris)
+summary(model)
+```
+從報表中來看，我們可以獲得許多資訊：
+
+* Sepal.Length = 1.85600 + 0.65084xSepal.Width + 0.70913xPetal.Length - 0.55648xPetal.Width
+
+* 根據p-value，三個自變數(X)對Y都表示顯著。
+
+* R-squared: 0.8586 ； Adj R-squared: 0.8557，表示模型預測能力不錯。
+
+* Residual standard error: 0.3145
+
+然而，當我們建立出一個線性回歸時，必須要確認其殘差(residual)是否符合下面三個假設：
+
+1. 常態性(Normality)
+
+2. 獨立性(Independence)
+
+3. 變異數同質性(Homogeneity of Variance)
+
+故，首先我們要先從回歸模型中找到殘差的值，可以使用`names()`函式，查看回歸模型內具有的資訊：
+```{r}
+names(model)
+```
+其中，**residuals**就是指殘差的值(**coefficients**代表係數)，因此我們可以取出來後進行上面三個假設的檢定：
+```{r}
+model$residual
+```
+
+##**常態性**   
+`shapiro.test()`函式可以用來檢驗殘差的常態性：   
+
+```{r}
+shapiro.test(model$residual)
+```
+由於**虛無假設H0:殘差服從常態分配**，因為p-value > 0.05，代表**不會拒絕H0**。   
+   
+   
+   
+##**獨立性**   
+要檢驗殘差的獨立性，需要使用套件`car`中的`durbinWatsonTest()`函式：
+   
+```{r,message=FALSE}
+require(car)
+# 因為這個函式會自動去抓模型中的殘差，故這裡放的是模型，而不是殘差的值
+durbinWatsonTest(model) 
+```
+由於**虛無假設H0:殘差間相互獨立**，因為p-value > 0.05，代表**不會拒絕H0**。
+   
+   
+   
+   
+##**變異數同質性**   
+要檢驗殘差的變異數同質性，需要使用套件`car`中的`ncvTest()`函式：
+
+```{r,message=FALSE}
+require(car)
+# 因為這個函式會自動去抓模型中的殘差，故這裡放的是模型，而不是殘差的值
+ncvTest(model)
+```
+由於**虛無假設H0:殘差變異數具有同質性**，因為p-value < 0.05，代表**拒絕H0**。(這表示上面的線性模型無法使用)   
+
+
+##**預測**    
+最後，我們建立模型的目的，是要用來預測！
+
+因此，現在我們手上有一筆新的觀測值，只有Sepal.Width、Petal.Length、Petal.Width的資訊，那我們就可以用建好的迴歸模型，預測出Sepal.Length的值，這時使用`predict()`函式：
+
+```{r}
+new.iris <- data.frame(Sepal.Width=3.456, Petal.Length=1.535, Petal.Width=0.341)
+new.iris
+predict(model, new.iris)
+```  
+      
+------
+   
+   
+#**5. 變異數分析(anova)**   
+
+經過視覺化的步驟，發現三個品種鳶尾花的Petal.Width或Petal.Length(平均數)有所差異。   
+   
+若要用統計上的檢定，要進一步地確認，就可以使用變異數分析(anova)。   
+   
+假設檢定的對應H0和H1分別如下：   
+**H0:μ(Setosa)=μ(Versicolor)=μ(Virginica)**   
+**H1:至少有一種平均數和其他品種不相等**   
+   
+要用one-way-anova，R的函式是`anova()`，並且事先要跑線性回歸模型：
+```{r}
+a.lm <- lm(Petal.Width~Species, data=iris)
+anova(a.lm)
+
+b.lm <- lm(Petal.Length~Species, data=iris)
+anova(b.lm)
+```
+   
+兩者的p-value都遠小於0.05，表示不同品種間確實有顯著差異。
+   
+------
+   
+#**總結**  
+
+完成這篇筆記後，除了複習之前的技巧之外，還學到了新的技巧：**遺漏值處理，迴歸分析，變異數分析**。   
+   
+事實上，要學會R的各種技巧並不難！難的是當我們陸續學到許多技巧後，要如何把這些技巧靈活運用在各式各樣的資料上。同時，你需要了解R再強大，充其量不過只是一個工具而已，若沒有紮實基礎與清楚的思維，也只是在舞刀耍棍罷了，實際上是派不上用場的。
+   
+之後，會繼續介紹各種不同的模型(決策樹、類神經網路...)，在R上怎麼操作，並且根據不同的資料，導入不同(資料)處理手法。   
+
+It's still a long way to go~   
+   
+
