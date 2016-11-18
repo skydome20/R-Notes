@@ -1,17 +1,12 @@
 ## R系列筆記
 
-這是我的R學習筆記，主要是用R-Markdown 所撰寫，使用Knit套件編譯，並且發表到Rpubs上：   
-http://rpubs.com/skydome20/Table_of_Content   
+這是我的R學習筆記，主要是用R Markdown 所撰寫，使用Knitr套件編譯成Html後，發表到Rpubs上：   
+<a href="http://rpubs.com/skydome20/Table_of_Content" target="_blank">http://rpubs.com/skydome20/Table_of_Content</a>   
 
+----------
 
+在GitHub中的，筆記的R Markdown原始檔。   
+資料夾的編號和筆記的編號一致，可以去對應編號的資料夾，找尋自己想要的筆記原始檔(.Rmd)。   
+例如：`R筆記 – (1)安裝R與RStudio`，所對應的原始檔路徑會是`R1/R1.Rmd`   
 
-With the concern of degree of freedom, this function converts n 'category'('factor' and 'chr') variables to n-1 'dummy' variables of a data frame.   
-
-Traditionally, there are three steps to convert 'category' variables to 'dummy' variables of a data.frame:   
-1. a data.frame must be divided as a data.frame with all 'category' variables and a data.frame with all 'non-category' variables.   
-2. Then, calling the function 'model,matrix()' to convert 'category' variables to 'dummy' variables.   
-3. Finally, combining 'dummy' variables with 'non-facotry' variables as a new data.frame for analyzing.   
-
-However, it's really annoying to do such thing below, thus this function pops up!   
- 
-This function will handle an original data frame by automatically identifying 'category' variables for 'dummy' variables converting, and remaining 'non-cateogry' variables.  
+若筆記有任何問題或錯誤，歡迎隨時來信：  skydome20@gmail.com
