@@ -1,4 +1,9 @@
-## Introduction
+## R系列筆記
+
+這是我的R學習筆記，主要是用R-Markdown 所撰寫，使用Knit套件編譯，並且發表到Rpubs上：   
+http://rpubs.com/skydome20/Table_of_Content   
+
+
 
 With the concern of degree of freedom, this function converts n 'category'('factor' and 'chr') variables to n-1 'dummy' variables of a data frame.   
 
