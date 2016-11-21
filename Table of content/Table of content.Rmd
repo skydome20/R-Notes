@@ -1,14 +1,14 @@
 ---
-title: "R教學 – 系列筆記"
+title: "R系列筆記"
 author: "skydome20 (skydome20@gmail.com)"
-date: "2016/11/19(update)"
+date: "2016/11/21(update)"
 output: 
   html_document:
         css: style.css
 ---
 【LinkedIn】 <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>   
-
-【GitHub Download】 <a href="https://github.com/skydome20/R-Notes" target="_blank">https://github.com/skydome20/R-Notes</a>
+   
+【GitHub Download】 <a href="https://github.com/skydome20/R-Notes" target="_blank">https://github.com/skydome20/R-Notes</a>   
 
 ------
    
@@ -45,7 +45,7 @@ output:
    
 ###**￡資料視覺化**  
 
-* <a href="http://rpubs.com/skydome20/R-Note4-Plotting_System" target="_blank">R筆記 – (4)繪圖-資料視覺化</a>   
+* <a href="http://rpubs.com/skydome20/R-Note4-Plotting_System" target="_blank">R筆記 – (4)繪圖 – 資料視覺化</a>   
 
 ------   
    
@@ -61,6 +61,9 @@ output:
 
    
 ###**￡Kaggle**  
+
+* <a href="http://rpubs.com/skydome20/R-Note12-DigitRecognizer-Kaggle" target="_blank">R筆記 – (12) Digit Recognizer (深度學習–DNN, CNN)</a>   
+   
    
 ------  
 

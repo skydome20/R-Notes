@@ -7,7 +7,7 @@ output:
         css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table_of_Content" target="_blank">【R系列筆記】</a>  
+<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
 
 ------
   
@@ -57,7 +57,7 @@ head(data)
 
 而在建構formula時，就可以寫成**setosa + versicolor + virginica ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width**。
 
-```{r,}
+```{r}
 formula.bpn <- setosa + versicolor + virginica ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width
 ```
 

@@ -7,7 +7,7 @@ output:
         css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table_of_Content" target="_blank">【R系列筆記】</a>   
+<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>   
 
 ------
   
@@ -25,7 +25,7 @@ output:
 
 ```{r}
 # 記得要給定資料所在的路徑(path)，例如：我把下載的資料放在C槽下：
-load("C:/titanic.raw.rdata")  #匯入.rdata檔
+load("titanic.raw.rdata")  #匯入.rdata檔
 ```   
    
 **(補充：如果我們要匯入.csv檔，除了之前教的方法以外，也可以用函式`read.csv()`)**   

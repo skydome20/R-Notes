@@ -7,7 +7,7 @@ output:
         css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table_of_Content" target="_blank">【R系列筆記】</a>  
+<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
 
 ------
   
@@ -32,7 +32,7 @@ output:
 ## 1. 主成份分析
 當下載好資料後，第一步便是先讀取資料：
 ```{r}
-data <- read.csv("C:/2012MLB.csv",  # 資料檔名 
+data <- read.csv("2012MLB.csv",  # 資料檔名 
                  header=T,          # 資料中的第一列，作為欄位名稱
                  sep=",")           # 將逗號視為分隔符號來讀取資料
 

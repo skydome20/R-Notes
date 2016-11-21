@@ -5,7 +5,7 @@ date: "2015/12/09"
 output: html_document
 ---
 
-<a href="http://rpubs.com/skydome20/Table_of_Content" target="_blank">【R系列筆記】</a>  
+<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
 
 ------
 
