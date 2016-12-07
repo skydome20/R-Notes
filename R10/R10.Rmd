@@ -1,5 +1,5 @@
 ---
-title: "R筆記--(10)遺漏值處理(Missing Value)"
+title: "R筆記--(10)遺漏值處理(Impute Missing Value)"
 author: "skydome20 (skydome20@gmail.com)"
 date: "2016/06/06"
 output: 
@@ -32,28 +32,32 @@ is.na(tmp)
 sum(is.na(tmp))
 ```      
 
-在R裡面處理遺漏值時，最常使用的就是`mice`套件，其全名為**Multivariate Imputation via Chained Equations**，裡面會運用資料探勘的方法，針對遺漏值進行「模擬填值」的動作。   
-
-
-```{r, message=FALSE}
-require(mice)
-```   
-
-我們一樣使用`iris`的資料集，並且讓資料中隨機產生遺漏值，來練習之後介紹的處理手法：   
+在處理遺漏值時，大多數的人都會「直接移除資料」或是用「平均值來填補遺漏值」，但這樣的做法並不推薦：前者會讓資料減少，後者不會產生任何資訊。
+   
+   
+因此在遺漏值處理的手法上，最推崇的就是「k-Nearest Neighbours」或「`mice`套件」來填補遺漏值。其中，mice的全名為**Multivariate Imputation via Chained Equations**。   
+   
+兩者的概念很簡單，都是先用資料探勘的方法「模擬遺漏值」後，再進行「填補(impute)」。詳情會在下面介紹。   
+   
+   
+------
+   
+   
+我們先使用`iris`的資料集，讓資料中隨機產生遺漏值，再來練習剛剛介紹的處理手法：   
 
 ```{r, message=FALSE}
 require(missForest) # prodNA() function
 
 # 在iris資料內，隨機產生10%的遺漏值
 data <- prodNA(iris, noNA = 0.1)
+# 可以注意到，資料裡面有NA的存在，代表Not-Available(遺漏值)
 head(data)
 ```   
-
+   
+接著介紹剛剛提及的四種處理遺漏值的手法：
 
 ------
   
-
-一般來說，在處理遺漏值時有以下手法：
 
 ## 1. 直接移除有遺漏值的資料   
 
@@ -75,7 +79,7 @@ rm.data <- data[complete.cases(data), ]
 ##2. 用「平均數」、「第一四分位數」...來填補遺漏值：   
 
 
-```{r}
+```{r, warning=FALSE}
 # 以下用平均數，來填補某一欄位的遺漏值
 mean.data <- data
 
@@ -89,7 +93,31 @@ mean.data[na.rows, 1] <- mean.1
 ------
   
 
-##3. 用MICE填補遺漏值：   
+##3. 用K-Nearest Neighbours填補遺漏值：   
+
+K-Nearest Neighbours(KNN)運用在遺漏值填補上的想法很簡單：   
+  
+現在有一群學生的成績，包含國文、數學、自然，但老師不小心弄丟小明的國文考卷，於是小明的「國文」分數是遺漏值。   
+
+如果在不重考的狀況下，我們要給小明一個分數，該怎麼做？   
+
+KNN的概念告訴我們，應該先看小明「數學和自然」的分數，看和哪些同學(K位)很相近，然後再拿那些同學(K位)的國文分數，取平均或加權平均(或是其他手法)後，當作小明的分數來填補。   
+
+一句話概括：「就是找和自己很像的K個鄰居，然後從他們身上複製自己所沒有的東西。」   
+   
+這就是用KNN來填補遺漏值的想法。   
+
+```{r, message=FALSE}
+require(DMwR)
+imputeData <- knnImputation(data)
+head(imputeData)
+
+```
+
+------
+
+
+##4. 用MICE填補遺漏值：   
 
 在MICE裡面，提供了很多資料探勘的模型(linear regression, logistic regression, cart, random forest, boostrap......)，來針對遺漏值進行預測！   
 
@@ -101,7 +129,8 @@ mean.data[na.rows, 1] <- mean.1
 
 (由於這個函式，背後有使用Gibbs sampling(一種抽樣手法)。所以，即使使用某個模型進行遺漏值填補，也會因為抽樣手法，造成最後填補的結果有些許不同)   
 
-```{r, results='hide'}
+```{r, results='hide', message=FALSE}
+require(mice)
 mice.data <- mice(data,
                   m = 3,           # 產生三個被填補好的資料表
                   maxit = 50,      # max iteration
@@ -121,10 +150,10 @@ complete(mice.data, 3) # 3rd data
 
 現在，我們可以任取其中一個「填補好的資料」，來進行後續的建模了！   
 
-```{r, results='hide'}
+```{r}
 # e.g. 拿第二個資料，作為我後續分析的資料
 df <- complete(mice.data, 2)
-
+head(df)
 # 然後以df進行線性迴歸、類神經網路、主成份分析...等等
 
 ```

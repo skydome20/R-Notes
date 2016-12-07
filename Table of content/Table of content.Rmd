@@ -29,7 +29,7 @@ output:
    
 ###**￡資料處裡**   
    
-* <a href="http://www.rpubs.com/skydome20/R-Note10-Missing_Value" target="_blank">R筆記 – (10)遺漏值處理(Missing Value)</a>   
+* <a href="http://www.rpubs.com/skydome20/R-Note10-Missing_Value" target="_blank">R筆記 – (10)遺漏值處理(Impute  Missing Value)</a>   
    
 ------   
    
