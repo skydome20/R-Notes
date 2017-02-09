@@ -1,6 +1,6 @@
 ## R系列筆記
 
-這是我的R學習筆記，主要是用R Markdown 所撰寫，使用Knitr套件編譯成Html後，發表到Rpubs上：   
+這份筆記主要是用R Markdown 所撰寫，使用Knitr套件編譯成Html後，發表到Rpubs上：   
 <a href="http://rpubs.com/skydome20/Table" target="_blank">http://rpubs.com/skydome20/Table</a>   
 
 ----------
