@@ -1,7 +1,7 @@
 ---
 title: "R系列筆記"
 author: "skydome20 (skydome20@gmail.com)"
-date: "2016/11/21(update)"
+date: "2017/01/31(update)"
 output: 
   html_document:
         css: style.css
@@ -9,6 +9,10 @@ output:
 【LinkedIn】 <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>   
    
 【GitHub Download】 <a href="https://github.com/skydome20/R-Notes" target="_blank">https://github.com/skydome20/R-Notes</a>   
+
+
+【2017資料科學年會：從預測性思維到處方性決策】 <a href="http://datasci.tw/event/manufacturing_170211/" target="_blank">http://datasci.tw/event/manufacturing_170211/</a>   
+
 
 ------
    
@@ -27,7 +31,7 @@ output:
    
 ------   
    
-###**￡資料處裡**   
+###**￡資料處理**   
    
 * <a href="http://www.rpubs.com/skydome20/R-Note10-Missing_Value" target="_blank">R筆記 – (10)遺漏值處理(Impute  Missing Value)</a>   
    
@@ -63,6 +67,14 @@ output:
 ###**￡Kaggle**  
 
 * <a href="http://rpubs.com/skydome20/R-Note12-DigitRecognizer-Kaggle" target="_blank">R筆記 – (12) Digit Recognizer (深度學習–DNN, CNN)</a>   
+   
+   
+------  
+
+   
+###**￡其他**  
+
+* <a href="http://rpubs.com/skydome20/R-Note13-Web-Crawler-on-CIA-CREST-by-xml2" target="_blank">R筆記 – (13) 網路爬蟲(Crawler)：用xml2爬美國中情局(CIA)的解密文件資料庫</a>   
    
    
 ------  
