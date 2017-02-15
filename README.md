@@ -15,7 +15,7 @@
 ###**￡環境建置**   
 
 * <a href="https://skydome20.github.io/R-Notes/R1/R1.html" target="_blank">R筆記 – (1)安裝R與RStudio</a>   
-
+* [R筆記 – (1)安裝R與RStudio](https://skydome20.github.io/R-Notes/R1/R1)
 
 ###**￡基本觀念 & 語法**   
    
