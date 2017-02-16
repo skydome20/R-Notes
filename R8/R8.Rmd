@@ -1,0 +1,222 @@
+---
+title: "R筆記--(8)類神經網路(neuralnet)"
+author: "skydome20 (skydome20@gmail.com)"
+date: "2016/05/23"
+output: 
+  html_document:
+        css: style.css
+---
+
+<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
+
+------
+  
+本篇內容，會繼續介紹一些常用的資料探勘模型：   
+   
+------
+   
+
+要使用(倒傳遞)類神經網路，R提供一個可以設定「多個隱藏層」的套件，叫做`neuralnet`。    
+
+然而，當使用類神經網路時，有一個議題十分重要，那就是我們究竟該決定「多少隱藏層和節點」？   
+
+理論上來說，我們會針對層數和節點數進行調整，看怎麼樣的組合會有最小的MSE(RMSE)，這樣的動作叫做**tune parameters**。   
+
+幸好，R提供一個套件`caret`，可以協助我們達成這樣的目的；否則的話，我們就需要自己撰寫迴圈(loop)和判斷式(if-else)，那會是一個十分複雜且龐大的工程。   
+
+接下來，會以R內建的iris資料，進行「倒傳遞類神經網路(bpn)」的示範：
+
+#**(倒傳遞)類神經網路(Artificial Neural Network)**   
+
+首先，以下是必須安裝的套件：
+```{r, message=FALSE, warning=FALSE}
+require(neuralnet) # for neuralnet(), nn model
+require(nnet)      # for class.ind()
+require(caret)     # for train(), tune parameters
+
+```
+
+很直觀的，**Sepal.Length、Sepal.Width、Petal.Length、Petal.Width**會是input nodes，而**Species**是output node。
+
+然而，由於**Species**是類別變數(也就是「分類」的問題)，類神經網路無法直接處理。   
+
+因此這個時候，必須先將**Species**，轉變成啞變數(dummy variables)的型態。
+
+```{r}
+data <- iris
+
+# 因為Species是類別型態，這邊轉換成三個output nodes，使用的是class.ind函式()
+head(class.ind(data$Species))
+
+# 並和原始的資料合併在一起，cbind意即column-bind
+data <- cbind(data, class.ind(data$Species))
+
+# 原始資料就會變成像這樣
+head(data)
+```
+
+而在建構formula時，就可以寫成**setosa + versicolor + virginica ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width**。
+
+```{r}
+formula.bpn <- setosa + versicolor + virginica ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width
+```
+
+在訓練bpn模型的時候，使用的是`neuralnet()`函式：
+
+```{r}
+bpn <- neuralnet(formula = formula.bpn, 
+                  data = data,
+                  hidden = c(2),       # 一個隱藏層：2個node
+                  learningrate = 0.01, # learning rate
+                  threshold = 0.01,    # partial derivatives of the error function, a stopping criteria
+                  stepmax = 5e5        # 最大的ieration數 = 500000(5*10^5)
+
+                  )
+
+# bpn模型會長得像這樣
+plot(bpn)
+```
+<img src="1.png">   
+
+基本上，這就是一個類神經網路的模型。
+
+------
+
+#**Tuning Parameters**   
+
+當使用不同的隱藏層數和節點數，類神經網路的模型表現與可靠度就會改變。   
+
+基本上，當遇到需要tuning parameters的問題時，就會需要觀察不同參數組合的MSE(RMSE)；當MSE最小的情況發生時，我們就可以視為是最佳的參數組合(optimal parameters)。   
+
+在R裡面，`caret`是十分強大的套件，許多需要tune parameters的問題都可以靠它來解決，而最常用的函式就是`train()`。   
+
+在繼續做下去之前，我們先把原始的資料集，分成80%的train set和20%的test set。   
+使用的手法十分簡單：可以想像現在手上資料有一百筆，那我們就隨機從裡面開始抽樣，隨機抽出80筆當成train set，剩下20筆當作test set。   
+
+以下就是在做上面的動作：   
+
+```{r}
+# nrow()是用來擷取資料筆數，乘上0.8後，表示我們的train set裡面要有多少筆資料(data size)
+smp.size <- floor(0.8*nrow(data)) 
+# 因為是抽樣，有可能每次抽樣結果都不一樣，因此這裡規定好亂數表，讓每次抽樣的結果一樣
+set.seed(131)                     
+# 從原始資料裡面，抽出train set所需要的資料筆數(data size)
+train.ind <- sample(seq_len(nrow(data)), smp.size)
+# 分成train/test
+train <- data[train.ind, ]
+test <- data[-train.ind, ]
+```
+
+然後我們根據train set，來進行tune parameters。   
+
+(註：下面的code實際上會運行比較長的時間，當使用不同的資料集時，有時候可能會跑數天以上，需要特別留意。)   
+
+```{r, warning=FALSE, cache=TRUE}
+# tune parameters
+model <- train(form=formula.bpn,     # formula
+               data=train,           # 資料
+               method="neuralnet",   # 類神經網路(bpn)
+               
+               # 最重要的步驟：觀察不同排列組合(第一層1~4個nodes ; 第二層0~4個nodes)
+               # 看何種排列組合(多少隱藏層、每層多少個node)，會有最小的RMSE
+               tuneGrid = expand.grid(.layer1=c(1:4), .layer2=c(0:4), .layer3=c(0)),               
+               
+               # 以下的參數設定，和上面的neuralnet內一樣
+               learningrate = 0.01,  # learning rate
+               threshold = 0.01,     # partial derivatives of the error function, a stopping criteria
+               stepmax = 5e5         # 最大的ieration數 = 500000(5*10^5)
+               )
+
+# 會告訴你最佳的參數組合是什麼：第一隱藏層1個node，第二隱藏層2個node
+model
+
+# 把參數組合和RMSE畫成圖
+plot(model)
+```
+   
+所以我們就以兩層隱藏層(1,2)，重新訓練類神經網路模型：
+
+```{r}
+bpn <- neuralnet(formula = formula.bpn, 
+                  data = train,
+                  hidden = c(1,2),     # 第一隱藏層1個node，第二隱藏層2個nodes
+                  learningrate = 0.01, # learning rate
+                  threshold = 0.01,    # partial derivatives of the error function, a stopping criteria
+                  stepmax = 5e5        # 最大的ieration數 = 500000(5*10^5)
+
+                  )
+
+# 新的bpn模型會長得像這樣
+plot(bpn)
+```
+
+<img src="2.png">   
+
+
+------
+
+
+#**預測**   
+
+接下來，就用訓練好的模型(bpn)預測test set：
+
+```{r}
+# 使用bpn模型，輸入test set後進行預測
+# 需要注意的是，輸入的test資料只能包含input node的值
+# 所以取前四個欄位，丟入模型進行預測
+pred <- compute(bpn, test[, 1:4])  
+
+# 預測結果
+pred$net.result
+
+# 四捨五入後，變成0/1的狀態
+pred.result <- round(pred$net.result)
+pred.result
+
+# 把結果轉成data frame的型態
+pred.result <- as.data.frame(pred.result)
+
+```
+
+把預測結果轉回Species的型態：
+
+```{r}
+# 建立一個新欄位，叫做Species
+pred.result$Species <- ""
+
+# 把預測結果轉回Species的型態
+for(i in 1:nrow(pred.result)){
+  if(pred.result[i, 1]==1){ pred.result[i, "Species"] <- "setosa"}
+  if(pred.result[i, 2]==1){ pred.result[i, "Species"] <- "versicolor"}
+  if(pred.result[i, 3]==1){ pred.result[i, "Species"] <- "virginica"}
+}
+
+pred.result
+
+```
+
+接下來，看實際值和預測結果的差異：
+
+```{r}
+# 混淆矩陣 (預測率有96.67%)
+table(real    = test$Species, 
+      predict = pred.result$Species)
+
+```
+
+
+------
+   
+#**總結**  
+
+類神經網路是一個很強大的方法，屬於機器學習的範疇，因此在預測上有很好的效果，可是最大的問題則是難以解釋。   
+   
+在資工的領域中，人工智慧就是類神經網路的一個分支，屬於深度學習(deep learning)的範疇。   
+   
+
+最近世界知名的AlphaGo(Google的人工智慧)，其內部結構，就是一個多達<a href="http://www.bnext.com.tw/article/view/id/38923" target="_blank">十三層隱藏層的類神經網路</a>。  
+
+It's still a long way to go~   
+   
+
+
