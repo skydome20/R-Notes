@@ -50,7 +50,7 @@
    
 ###**￡分散式處理**  
 
-* <a href="https://skydome20.github.io/R-Notes/sparkR/sparkR" target="_blank">R筆記 – SparkR</a>   
+* <a href="https://skydome20.github.io/R-Notes/SparkR/sparkR" target="_blank">R筆記 – SparkR</a>   
 
 ------   
    
