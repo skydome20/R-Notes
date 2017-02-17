@@ -1,4 +1,4 @@
-## R系列筆記
+# R系列筆記
 
 這份筆記是用R Markdown 撰寫，再用Knitr套件編譯成Html檔案，發表到Rpubs上：   
 <a href="http://rpubs.com/skydome20/Table" target="_blank">http://rpubs.com/skydome20/Table</a>   
@@ -11,6 +11,8 @@
 
 
 ----------
+
+# R筆記目錄
   
 ###**￡環境建置**   
 
