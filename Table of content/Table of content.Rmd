@@ -1,80 +1,80 @@
 ---
-title: "Rç³»åˆ—ç­†è¨˜"
+title: "Rç³»å?—ç?†è??"
 author: "skydome20 (skydome20@gmail.com)"
 date: "2017/01/31(update)"
 output: 
   html_document:
         css: style.css
 ---
-ã€LinkedInã€‘ <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>   
+?€LinkedIn?€? <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>   
    
-ã€GitHub Downloadã€‘ <a href="https://github.com/skydome20/R-Notes" target="_blank">https://github.com/skydome20/R-Notes</a>   
+?€GitHub Download?€? <a href="https://github.com/skydome20/R-Notes" target="_blank">https://github.com/skydome20/R-Notes</a>   
 
 
-ã€2017è³‡æ–™ç§‘å­¸å¹´æœƒï¼šå¾é æ¸¬æ€§æ€ç¶­åˆ°è™•æ–¹æ€§æ±ºç­–ã€‘ <a href="http://datasci.tw/event/manufacturing_170211/" target="_blank">http://datasci.tw/event/manufacturing_170211/</a>   
+?€?2017è³‡æ?™ç?‘å­¸å¹´æ?ƒï?šå?é?æ¸¬?€§æ€ç¶­?ˆ°??•æ–¹?€§æ±ºç­–ã€? <a href="http://datasci.tw/event/manufacturing_170211/" target="_blank">http://datasci.tw/event/manufacturing_170211/</a>   
 
 
 ------
    
    
-###**ï¿¡ç’°å¢ƒå»ºç½®**   
+###**ï¿¡ç’°å¢ƒå»ºç½?**   
 
-* <a href="https://rpubs.com/skydome20/R-Note1-R_and_RStudio" target="_blank">Rç­†è¨˜ â€“ (1)å®‰è£Rèˆ‡RStudio</a>   
+* <a href="https://rpubs.com/skydome20/R-Note1-R_and_RStudio" target="_blank">Rç­†è?? ?€? (1)å®‰è?R??‡RStudio</a>   
    
 ------   
    
-###**ï¿¡åŸºæœ¬è§€å¿µ & èªæ³•**   
+###**ï¿¡åŸº?œ¬è§€å¿? & èªæ??**   
    
-* <a href="https://rpubs.com/skydome20/R-Note2-dataType" target="_blank">Rç­†è¨˜ â€“ (2)åŸºæœ¬è³‡æ–™å‹æ…‹</a>     
-* <a href="https://rpubs.com/skydome20/R-Note3-function_and_package" target="_blank">Rç­†è¨˜ â€“ (3)å¥—ä»¶èˆ‡å‡½å¼</a>    
-* <a href="http://rpubs.com/skydome20/R-Note11-Control_Flow" target="_blank">Rç­†è¨˜ â€“ (11)æµç¨‹æ§åˆ¶(for, while, ifelse, switch)</a>     
-   
-------   
-   
-###**ï¿¡è³‡æ–™è™•ç†**   
-   
-* <a href="http://www.rpubs.com/skydome20/R-Note10-Missing_Value" target="_blank">Rç­†è¨˜ â€“ (10)éºæ¼å€¼è™•ç†(Impute  Missing Value)</a>   
+* <a href="https://rpubs.com/skydome20/R-Note2-dataType" target="_blank">Rç­†è?? ?€? (2)?Ÿº?œ¬è³‡æ?™å?‹æ??</a>     
+* <a href="https://rpubs.com/skydome20/R-Note3-function_and_package" target="_blank">Rç­†è?? ?€? (3)å¥—ä»¶??‡å‡½å¼?</a>    
+* <a href="http://rpubs.com/skydome20/R-Note11-Control_Flow" target="_blank">Rç­†è?? ?€? (11)æµç?‹æ§?ˆ¶(for, while, ifelse, switch)</a>     
    
 ------   
    
-###**ï¿¡æ¨¡å‹å»ºæ§‹**  
+###**ï¿¡è?‡æ?™è?•ç??**   
    
-* <a href="http://rpubs.com/skydome20/R-Note5-First_Practice" target="_blank">Rç­†è¨˜ â€“ (5)åˆè²è©¦å•¼-ç°¡å–®çš„è³‡æ–™åˆ†æ(è¿´æ­¸åˆ†æ)</a>   
-* <a href="http://www.rpubs.com/skydome20/R-Note6-Apriori-DecisionTree" target="_blank">Rç­†è¨˜ â€“ (6)é—œè¯å¼è¦å‰‡ï¼›æ±ºç­–æ¨¹(åˆ†æéµé”å°¼è™Ÿè³‡æ–™)</a>   
-* <a href="http://rpubs.com/skydome20/R-Note7-PCA" target="_blank">Rç­†è¨˜ â€“ (7)ä¸»æˆä»½åˆ†æ(2012ç¾åœ‹è·æ£’MLB)</a>   
-* <a href="http://rpubs.com/skydome20/R-Note8-ANN" target="_blank">Rç­†è¨˜ â€“ (8)é¡ç¥ç¶“ç¶²è·¯(neuralnet)</a>   
-* <a href="http://www.rpubs.com/skydome20/R-Note9-Clustering" target="_blank">Rç­†è¨˜ â€“ (9)åˆ†ç¾¤åˆ†æ(Clustering)</a>   
+* <a href="http://www.rpubs.com/skydome20/R-Note10-Missing_Value" target="_blank">Rç­†è?? ?€? (10)?ºæ¼å€¼è?•ç??(Impute  Missing Value)</a>   
    
 ------   
    
-###**ï¿¡è³‡æ–™è¦–è¦ºåŒ–**  
+###**ï¿¡æ¨¡??‹å»ºæ§?**  
+   
+* <a href="http://rpubs.com/skydome20/R-Note5-First_Practice" target="_blank">Rç­†è?? ?€? (5)??è²è©¦å•¼-ç°¡å–®??„è?‡æ?™å?†æ??(è¿´æ­¸??†æ??)</a>   
+* <a href="http://www.rpubs.com/skydome20/R-Note6-Apriori-DecisionTree" target="_blank">Rç­†è?? ?€? (6)??œè¯å¼è?å?‡ï?›æ±ºç­–æ¨¹(??†æ?éµ??”å°¼??Ÿè?‡æ??)</a>   
+* <a href="http://rpubs.com/skydome20/R-Note7-PCA" target="_blank">Rç­†è?? ?€? (7)ä¸»æ?ä»½??†æ??(2012ç¾å?‹è·æ£’MLB)</a>   
+* <a href="http://rpubs.com/skydome20/R-Note8-ANN" target="_blank">Rç­†è?? ?€? (8)é¡ç?ç?“ç¶²è·?(neuralnet)</a>   
+* <a href="http://www.rpubs.com/skydome20/R-Note9-Clustering" target="_blank">Rç­†è?? ?€? (9)??†ç¾¤??†æ??(Clustering)</a>   
+   
+------   
+   
+###**ï¿¡è?‡æ?™è?–è¦º???**  
 
-* <a href="http://rpubs.com/skydome20/R-Note4-Plotting_System" target="_blank">Rç­†è¨˜ â€“ (4)ç¹ªåœ– â€“ è³‡æ–™è¦–è¦ºåŒ–</a>   
-
-------   
-   
-###**ï¿¡åˆ†æ•£å¼è™•ç†**  
-
-* <a href="http://rpubs.com/skydome20/R-Note-SparkR" target="_blank">Rç­†è¨˜ â€“ SparkR</a>   
+* <a href="http://rpubs.com/skydome20/R-Note4-Plotting_System" target="_blank">Rç­†è?? ?€? (4)ç¹ªå?? ?€? è³‡æ?™è?–è¦º???</a>   
 
 ------   
    
-###**ï¿¡æ–‡å­—æ¢å‹˜**  
+###**ï¿¡å?†æ•£å¼è?•ç??**  
+
+* <a href="http://rpubs.com/skydome20/R-Note-SparkR" target="_blank">Rç­†è?? ?€? SparkR</a>   
+
+------   
+   
+###**ï¿¡æ?‡å?—æ¢???**  
    
 ------  
 
    
 ###**ï¿¡Kaggle**  
 
-* <a href="http://rpubs.com/skydome20/R-Note12-DigitRecognizer-Kaggle" target="_blank">Rç­†è¨˜ â€“ (12) Digit Recognizer (æ·±åº¦å­¸ç¿’â€“DNN, CNN)</a>   
+* <a href="http://rpubs.com/skydome20/R-Note12-DigitRecognizer-Kaggle" target="_blank">Rç­†è?? ?€? (12) Digit Recognizer (æ·±åº¦å­¸ç?’â€“DNN, CNN)</a>   
    
    
 ------  
 
    
-###**ï¿¡å…¶ä»–**  
+###**ï¿¡å…¶ä»?**  
 
-* <a href="http://rpubs.com/skydome20/R-Note13-Web-Crawler-on-CIA-CREST-by-xml2" target="_blank">Rç­†è¨˜ â€“ (13) ç¶²è·¯çˆ¬èŸ²(Crawler)ï¼šç”¨xml2çˆ¬ç¾åœ‹ä¸­æƒ…å±€(CIA)çš„è§£å¯†æ–‡ä»¶è³‡æ–™åº«</a>   
+* <a href="http://rpubs.com/skydome20/R-Note13-Web-Crawler-on-CIA-CREST-by-xml2" target="_blank">Rç­†è?? ?€? (13) ç¶²è·¯?ˆ¬?Ÿ²(Crawler)ï¼šç”¨xml2?ˆ¬ç¾å?‹ä¸­??…å?€(CIA)??„è§£å¯†æ?‡ä»¶è³‡æ?™åº«</a>   
    
    
 ------  
