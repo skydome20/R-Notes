@@ -12,13 +12,13 @@
 
 # R筆記目錄
   
-###**￡環境建置**   
+### **￡環境建置**   
 
 * <a href="https://skydome20.github.io/R-Notes/R1/R1" target="_blank">R筆記 – (1)安裝R與RStudio</a>   
    
 ------   
    
-###**￡基本觀念 & 語法**   
+### **￡基本觀念 & 語法**   
    
 * <a href="https://skydome20.github.io/R-Notes/R2/R2" target="_blank">R筆記 – (2)基本資料型態</a>     
 * <a href="https://skydome20.github.io/R-Notes/R3/R3" target="_blank">R筆記 – (3)套件與函式</a>    
@@ -26,13 +26,13 @@
    
 ------   
    
-###**￡資料處理**   
+### **￡資料處理**   
    
 * <a href="https://skydome20.github.io/R-Notes/R10/R10" target="_blank">R筆記 – (10)遺漏值處理(Impute  Missing Value)</a>   
    
 ------   
    
-###**￡模型建構**  
+### **￡模型建構**  
    
 * <a href="https://skydome20.github.io/R-Notes/R5/R5" target="_blank">R筆記 – (5)初聲試啼-簡單的資料分析(迴歸分析)</a>   
 * <a href="https://skydome20.github.io/R-Notes/R6/R6" target="_blank">R筆記 – (6)關聯式規則；決策樹(分析鐵達尼號資料)</a>   
@@ -42,24 +42,24 @@
    
 ------   
    
-###**￡資料視覺化**  
+### **￡資料視覺化**  
 
 * <a href="https://skydome20.github.io/R-Notes/R4/R4" target="_blank">R筆記 – (4)繪圖 – 資料視覺化</a>   
 
 ------   
    
-###**￡分散式處理**  
+### **￡分散式處理**  
 
 * <a href="https://skydome20.github.io/R-Notes/SparkR/sparkR" target="_blank">R筆記 – SparkR</a>   
 
 ------   
    
-###**￡文字探勘**  
+### **￡文字探勘**  
    
 ------  
 
    
-###**￡Kaggle**  
+### **￡Kaggle**  
 
 * <a href="https://skydome20.github.io/R-Notes/R12/R12" target="_blank">R筆記 – (12) Digit Recognizer (深度學習–DNN, CNN)</a>   
    
@@ -67,7 +67,7 @@
 ------  
 
    
-###**￡其他**  
+### **￡其他**  
 
 * <a href="https://skydome20.github.io/R-Notes/R13/R13" target="_blank">R筆記 – (13) 網路爬蟲(Crawler)：用xml2爬美國中情局(CIA)的解密文件資料庫</a>   
    
