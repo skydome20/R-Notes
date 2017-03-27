@@ -1,17 +1,19 @@
 ---
 title: "R系列筆記"
 author: "skydome20 (skydome20@gmail.com)"
-date: "2017/01/31(update)"
+date: "2017/03/27(update)"
 output: 
   html_document:
         css: style.css
 ---
+
+【台灣資料科學年會： <a href="http://foundation.datasci.tw/manufacturing_170507/" target="_blank">2017-05-07  智慧製造與生產線上的資料科學</a>  】 
+
+
+
 【LinkedIn】 <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>   
    
 【GitHub Download】 <a href="https://github.com/skydome20/R-Notes" target="_blank">https://github.com/skydome20/R-Notes</a>   
-
-
-【2017資料科學年會：從預測性思維到處方性決策】 <a href="http://datasci.tw/event/manufacturing_170211/" target="_blank">http://datasci.tw/event/manufacturing_170211/</a>   
 
 
 ------
