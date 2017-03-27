@@ -9,9 +9,9 @@
 
 ----------
 
-【台灣資料科學年會： <a href="http://foundation.datasci.tw/manufacturing_170507/" target="_blank">2017-05-07 智慧製造與生產線上的資料科學</a> 】
-【LinkedIn】 <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>
-【GitHub Download】 <a href="https://github.com/skydome20/R-Notes" target="_blank">https://github.com/skydome20/R-Notes</a>
+【台灣資料科學年會： <a href="http://foundation.datasci.tw/manufacturing_170507/" target="_blank">2017-05-07 智慧製造與生產線上的資料科學</a> 】     
+【LinkedIn】 <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>    
+【GitHub Download】 <a href="https://github.com/skydome20/R-Notes" target="_blank">https://github.com/skydome20/R-Notes</a>    
 
 ----------
 
