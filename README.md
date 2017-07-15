@@ -8,10 +8,10 @@
 例如：`R筆記 – (1)安裝R與RStudio`這篇筆記，對應的原始檔路徑會是`R1/R1.Rmd`   
 
 ----------
-
-【台灣資料科學年會： <a href="http://foundation.datasci.tw/manufacturing_170507/" target="_blank">2017-05-07 智慧製造與生產線上的資料科學</a> 】     
+    
 【LinkedIn】 <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>    
 【Rpubs】 <a href="http://rpubs.com/skydome20/Table" target="_blank">http://rpubs.com/skydome20/Table</a>    
+【POLab】 <a href="https://github.com/PO-LAB/Data-Mining" target="_blank">https://github.com/PO-LAB/Data-Mining</a>   
 
 ----------
 
