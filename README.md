@@ -76,7 +76,7 @@
 
 * <a href="https://skydome20.github.io/R-Notes/R13/R13" target="_blank">R筆記 – (13) 網路爬蟲(Crawler)：用xml2爬美國中情局(CIA)的解密文件資料庫</a>   
    
-   
+* <a href="https://skydome20.github.io/R-Notes/R15/R15" target="_blank">R筆記 – (15) Windows安裝深度學習套件：Tensorflow/Keras(R版本)</a>   
 
 ----------
 
