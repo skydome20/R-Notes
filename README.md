@@ -44,7 +44,7 @@
 * <a href="https://skydome20.github.io/R-Notes/R7/R7" target="_blank">R筆記 – (7)主成份分析(2012美國職棒MLB)</a>   
 * <a href="https://skydome20.github.io/R-Notes/R8/R8" target="_blank">R筆記 – (8)類神經網路(neuralnet)</a>   
 * <a href="https://skydome20.github.io/R-Notes/R9/R9" target="_blank">R筆記 – (9)分群分析(Clustering)</a>   
-* <a href="https://skydome20.github.io/R-Notes/R14/R14" target="_blank">R筆記 – (14)Support Vector Machine/Regression(支持向量機SVM)</a  
+* <a href="https://skydome20.github.io/R-Notes/R14/R14" target="_blank">R筆記 – (14)Support Vector Machine/Regression(支持向量機SVM)</a>  
 ------   
    
 ### **￡資料視覺化**  
