@@ -19,7 +19,7 @@ output:
 
 ###**￡環境建置**   
 
-* <a href="https://rpubs.com/skydome20/R-Note1-R_and_RStudio" target="_blank">R筆記 – (1) 安裝R與RStudio</a>   
+* <a href="https://rpubs.com/skydome20/R1-R_and_RStudio" target="_blank">R筆記 – (1) 安裝R與RStudio</a>   
    
 ------   
    

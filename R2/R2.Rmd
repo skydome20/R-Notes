@@ -32,7 +32,7 @@ output:
 
 ------
 
-在<a href="https://rpubs.com/skydome20/R-Note1-R_and_RStudio" target="_blank">安裝完R與RStuio</a>   後，接下來要開始熟悉R的基本觀念。   
+在<a href="https://rpubs.com/skydome20/R1-R_and_RStudio" target="_blank">安裝完R與RStuio</a>   後，接下來要開始熟悉R的基本觀念。   
 要熟悉一個程式語言，第一步就是先了解定義在裡面的資料型態。而在R語言的資料型態，常用的有這些：
 
 * `integer`  
