@@ -17,17 +17,17 @@ output:
 
 0. [前言](#P0)
 1. [安裝Python版本的Tensorflow/Keras(運行深度學習模型的框架)](#P1)
-    * [安裝Anaconda](#P1-1)
-    * [在Anaconda下建立r-tensorflow的虛擬環境](#P1-2)
-    * [在r-tensorflow環境內，用pip安裝tensorflow/keras](#P1-3)
-    * [測試python的tensorflow是否能夠使用](#P1-4)
+    * [(1)安裝Anaconda](#P1-1)
+    * [(2)在Anaconda下建立r-tensorflow的虛擬環境](#P1-2)
+    * [(3)在r-tensorflow環境內，用pip安裝tensorflow/keras](#P1-3)
+    * [(4)測試python的tensorflow是否能夠使用](#P1-4)
 2. [安裝**R版本**的Tensorflow/Keras的(建立R跟Python之間的介面)](#P2)
-    * [用R安裝Github上的rstudio/keras或rstudio/tensorflow](#P2-1)
-    * [測試能否在R內使用tensorflow/keras](#P2-2)
+    * [(1)用R安裝Github上的rstudio/keras或rstudio/tensorflow](#P2-1)
+    * [(2)測試能否在R內使用tensorflow/keras](#P2-2)
 3. [Q&A](#P3)
 4. [總結](#P4)
 
----
+
 
 [Pytorch]:http://pytorch.org/tutorials/
 [Tensorflow]:https://www.tensorflow.org/
@@ -37,8 +37,6 @@ output:
 [Caffe]:http://caffe.berkeleyvision.org/
 [Torch]:http://torch.ch/
 [Anaconda]:https://anaconda.org/
-
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
 
 ------
 
@@ -254,6 +252,8 @@ R的套件主要是協助建立一個介面，讓我們可以用R語言，去連
 ```{r, eval=F}
 # installing 'devtools' package for installing Packages from github
 install.packages('devtools')
+
+require(devtools)
 
 # install tensorflow(如果你要tensorflow的話)
 devtools::install_github("rstudio/tensorflow") 
