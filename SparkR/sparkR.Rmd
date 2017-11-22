@@ -2,11 +2,32 @@
 title: "R筆記-SparkR"
 author: "skydome20(skydome20@gmail.com)"
 date: "2015/12/09"
-output: html_document
+output: 
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
 
+------
+
+# 本篇目錄
+
+0. [前言](#P0)
+1. [解析CIA (CREST project)的網址](#P1)
+2. [用xml2解析CIA搜尋結果的資訊](#P2)
+    * [(1) 解密文件的「標題」和對應的「超連結」](#P2-1)
+    * [(2) 共有「多少」搜尋結果](#P2-2)
+    * [(3) 共有「幾頁」搜尋結果](#P2-3)
+3. [下載解密文件](#P3)
+4. [進階：自動化整個流程(成果展現)](#P4)
+    * [basic.info.query.CIA_CREST(query)](#P4-1)
+    * [parsing.pages.CIA_CREST(query, pages)](#P4-2)
+    * [download.doc.CIA_CREST(parse.table)](#P4-3)
+5. [總結](#P5)
+6. [Reference](#P6)
 ------
 
 #簡介   

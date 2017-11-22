@@ -1,11 +1,34 @@
 ---
 title: "R筆記 – (15)Windows安裝深度學習套件：Tensorflow/Keras(R版本)"
-author: "skydome20 (skydome20@gmail.com)"
+author: "skydome20"
 date: "2017/10/13"
 output: 
-  html_document:
-        css: style.css
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
 ---
+
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
+
+------
+
+# 本篇目錄
+
+0. [前言](#P0)
+1. [安裝Python版本的Tensorflow/Keras(運行深度學習模型的框架)](#P1)
+    * [安裝Anaconda](#P1-1)
+    * [在Anaconda下建立r-tensorflow的虛擬環境](#P1-2)
+    * [在r-tensorflow環境內，用pip安裝tensorflow/keras](#P1-3)
+    * [測試python的tensorflow是否能夠使用](#P1-4)
+2. [安裝**R版本**的Tensorflow/Keras的(建立R跟Python之間的介面)](#P2)
+    * [用R安裝Github上的rstudio/keras或rstudio/tensorflow](#P2-1)
+    * [測試能否在R內使用tensorflow/keras](#P2-2)
+3. [Q&A](#P3)
+4. [總結](#P4)
+
+---
+
 [Pytorch]:http://pytorch.org/tutorials/
 [Tensorflow]:https://www.tensorflow.org/
 [Theano]:http://deeplearning.net/software/theano/
@@ -18,6 +41,8 @@ output:
 <a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
 
 ------
+
+##0.前言{#P0}
 
 目前主流的深度學習套件(框架/Framework）有：[Tensorflow], [Theano], [Mxnet], [Torch], [Caffe], [Keras]...
 
@@ -40,28 +65,9 @@ output:
 
 那麼，我們就開始吧，依序會有兩個主要步驟：
 
-1. 安裝**Python版本**的Tensorflow/Keras(運行深度學習模型的框架)
-
-    ```
-    1. 安裝Anaconda
-    2. 在Anaconda下建立r-tensorflow的虛擬環境
-    3. 在r-tensorflow環境內，用pip安裝tensorflow
-    4. 在r-tensorflow環境內，安裝keras
-    5. 測試python的tensorflow是否能夠使用
-    ```
-
-
-2. 安裝**R版本**的Tensorflow/Keras的(建立R跟Python之間的介面)
-
-    ```
-    1. 用R安裝Github上的rstudio/keras或rstudio/tensorflow
-    2. 使用require(tensorflow)/require(keras)匯入套件
-    3. 測試能否在R內使用tensorflow/keras
-    ```
-    
 ------
 
-## 1. Python版本的安裝作業   
+## 1. Python版本的安裝作業{#P1}
 
 首先，雖說被稱為R的版本，但[Tensorflow]/[Keras]的設計和本質還是基於Python。
 
@@ -78,7 +84,7 @@ output:
 ------
 
 
-### (1) 安裝Anaconda
+### (1) 安裝Anaconda {#P1-1}
 
 [這是載點](https://www.anaconda.com/download/)
 
@@ -101,7 +107,7 @@ output:
 ------
 
 
-### (2) 在Anaconda中創造一個r-tensorflow的虛擬環境
+### (2) 在Anaconda中創造一個r-tensorflow的虛擬環境 {#P1-2}
 
 接下來打開終端機(cmd)，輸入以下指令：
 
@@ -130,7 +136,7 @@ C:\> conda create --name r-tensorflow python=3.5
 
 ------
 
-### (3) 在r-tensorflow的環境裡，安裝tensorflow/keras
+### (3) 在r-tensorflow的環境裡，安裝tensorflow/keras {#P1-3}
 
 一樣在終端機(cmd)下，依序輸入以下指令：
 
@@ -189,7 +195,7 @@ TypeError: parse() got an unexpected keyword argument 'transport_encoding'
 
 ------
 
-### (4) 測試安裝成功與否
+### (4) 測試安裝成功與否 {#P1-4}
 
 安裝結束以後，你就可以使用python版本的tensorflow/keras了！(換句話說，之後有機會要用Python去操作tensorflow/keras的話，這個安裝流程一樣適用。)
 
@@ -233,7 +239,7 @@ C:\> activate r-tensorflow
 
 ------
 
-## 2. R版本的安裝作業   
+## 2. R版本的安裝作業   {#P2}
 
 建立好python的框架後，我們就可以開始安裝R的套件。
 
@@ -241,7 +247,7 @@ R的套件主要是協助建立一個介面，讓我們可以用R語言，去連
 
 ------
 
-### (1) 安裝rstudio/keras或rstudio/tensorflow
+### (1) 安裝rstudio/keras或rstudio/tensorflow {#P2-1}
 
 打開RStudio，先安裝Rtools (https://cran.r-project.org/bin/windows/Rtools/)，並且輸入以下指令：
 
@@ -258,7 +264,7 @@ devtools::install_github("rstudio/keras")
 
 ------
 
-### (2) 匯入套件並測試
+### (2) 匯入套件並測試 {#P2-2}
 
 
 然後就使用`library/require`函式匯入tensorflow/keras(我這裡用keras舉例)：
@@ -301,7 +307,7 @@ packageVersion("keras")
 ------
 
 
-#**Q&A**
+#**Q&A** {#P3}
 
 網路上有很多安裝教學跟流程，我大致都試過，經過一次次遇到問題，再一次次修正，最後整理這篇筆記。
 
@@ -344,7 +350,7 @@ packageVersion("keras")
 
 ------
 
-#**總結**  
+#**總結**  {#P4}
 
 恭喜你，現在已經可以開始在R上面訓練自己的深度學習模型了，幾篇教學文章提供如下：
 

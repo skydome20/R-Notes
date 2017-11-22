@@ -1,14 +1,39 @@
 ---
 title: "R筆記--(3)套件與函式"
-author: "skydome20 (skydome20@gmail.com)"
+author: "skydome20"
 date: "2016/03/14"
 output: 
-  html_document:
-        css: style.css
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>   
-   
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
+
+------
+
+# 本篇目錄
+
+1. [函式(function)](#P1)
+    * [Summarize函式](#P1-1)
+    * [敘述統計函式](#P1-2)
+    * [其他實用函式](#P1-3)
+        * [串接：paste(), append()](#P1-3-1)
+        * [合併：rbind(), cbind()](#P1-3-2)
+        * [數列：sample(), seq()](#P1-3-3)
+        * [預覽：head(), tail()](#P1-3-4)
+        * [排序：order(), sort()](#P1-3-5)
+        * [重複：unique(), duplicated()](#P1-3-6)
+        * [which()](#P1-3-7)
+2. [套件(package)](#P2)
+    * [安裝套件](#P2-1)
+        * [方法一：用RStudio介面](#P2-1-1)
+        * [方法二：用install.packages()](#P2-1-2)  
+    * [匯入套件](#P2-2)
+3. [總結](#P3)
+4. [(額外) Happy White Day](#P4)   
+
 ------
   
    
@@ -28,9 +53,9 @@ output:
 
 ------
 
-#**1. 函式(function)**
+#**1. 函式(function)**{#P1}
 
-##‧summary()   
+##Summarize函式{#P1-1}
 如果還記得的話，其實在上一篇的[文章](https://rpubs.com/skydome20/R-Note2-dataType)中，已經介紹過許多函式(`is.integer()`, `data frame()`, `c()`, `str()`...)   
 其中，`str()`十分好用，尤其在了解一筆資料時或未知的變數時，能派上很大的用場。   
 除此之外，還有一個相當強大、具有類似功能的函式，叫做`summary()`。   
@@ -54,7 +79,8 @@ summary(iris)
    
 (小練習)請試著在console裡，查詢`summary()`的說明文件
 
-##‧敘述統計函式   
+##敘述統計函式{#P1-2}   
+
 敘述統計是進行資料分析時，有效瀏覽(explore)、了解(recognize)資料狀態的步驟。   
 作為一個資料分析軟體，R裡面自然有許多可以協助我們進行敘述統計分析的函式：   
 
@@ -126,14 +152,14 @@ sum(a, na.rm=TRUE)
 
 ------
 
-##‧其他實用函式   
+##其他實用函式{#P1-3}   
 除了敘述統計的函式以外，R裡面還有一些好用的函式，常常會在處理資料時派上用場。   
 以下列出個人自認好用的函式，但這裡不會多加解釋。   
 若有困惑的話，先閱讀函式的說明文件，再加上自我練習，才能漸漸掌握每個函式的使用：   
 
-##paste(), append()   
+###串接：paste(), append(){#P1-3-1}   
 ```{r, results='hold'}
-# paste()：拼貼字串(把 "Happy"" 和 "White Day"" 兩個字串拼貼起來，sep代表連結字串的符號)
+# paste()：串接字串(把 "Happy"" 和 "White Day"" 兩個字串拼貼起來，sep代表連結字串的符號)
 paste("Happy", "White-Day", sep=" ") 
 
 # append()：把兩個vector串接起來 
@@ -142,27 +168,27 @@ c <- c(4,5,6)
 append(b, c)
 ```
 
-##rbind(), cbind()   
+###合併：rbind(), cbind(){#P1-3-2}   
 ```{r}
 a <- data.frame(x=c(1,2,3), y=c("Henry", "Lun", "Kevin"))
 b <- data.frame(x=c(4,5,6), y=c("Helen", "Tommy", "Leon"))
-rbind(a,b) # rbind()：把兩個data frame，依據row串接起來
-cbind(a,b) # cbind()：把兩個data frame，依據column串接起來
+rbind(a,b) # rbind()：把兩個data frame，依據row合併起來
+cbind(a,b) # cbind()：把兩個data frame，依據column合併起來
 ```
 
-##sample(), seq()   
+###數列：sample(), seq(){#P1-3-3}   
 ```{r, results='hold'}
 sample(x=1:100, size=10)  # 從1~100數字中，隨機挑10個數字，產生一個數列(vector)
 seq(from=1, to=5, by=0.5) # 產生一個「從1開始，每次加0.5，直到5為止」的數列(vector)
 ```
 
-##head(), tail()
+###預覽：head(), tail(){#P1-3-4}
 ```{r}
 head(iris, n=6)  # head(): 顯示data frame中的前6筆資料
 tail(iris, n=6)  # tail(): 顯示data frame中的後6筆資料
 ```
 
-##order(), sort()
+###排序：order(), sort(){#P1-3-5}
 ```{r}
 a <- sample(x=1:100, size=10) # 從1~100數字中，隨機挑10個數字，產生一個數列(vector)
 a
@@ -172,7 +198,7 @@ a[order(a, decreasing=TRUE)]
 sort(a, decreasing=TRUE)      
 ```
 
-##unique(), duplicated()
+###重複：unique(), duplicated(){#P1-3-6}
 ```{r}
 a <- c("A", "B", "C", "A", "A", "B")
 unique(a)       # 萃取資料中unique的element
@@ -182,7 +208,7 @@ duplicated(a)            # 若後面有重複的資料，函式會回傳TRUE，�
 a[duplicated(a)==FALSE]  # 和 unique(a)一樣效果
 ```
 
-##which()
+###which(){#P1-3-7}
 ```{r}
 # which()：找出第幾個element是TRUE(在a裡面，第幾個element的值等於100)
 a <- c(68,73,99,100,56,100,85,36)
@@ -192,7 +218,7 @@ which(a==100)
 
 ------
 
-#**2. 套件(package)**
+#**2. 套件(package)**{#P2}
 基本上，每一個函式都有對應的套件(package)。   
 不過你可能會覺得奇怪，當我們在使用上面那些函式時，似乎沒怎麼琢磨在套件上？   
 那是因為，R已經將那些套件內建在裡面，因此我們可以直接呼叫(call)這些函式來使用。    
@@ -207,33 +233,30 @@ ggplot(data=CO2)
 
 ------
 
-###(1)安裝套件   
+##(1)安裝套件{#P2-1}   
 我們先求助google大神，看`ggplot()`對應到的套件是哪一個？
 <img src="4.png" />   
 光看搜尋結果，就會發現對應的套件是**`ggplot2`**。   
 不過我們還是點開這個有CRAN字樣的網站：CRAN(Comprehensive R Archive Network)，是R的官方網站之一，裡面收錄了所有經過R官方核可後的函式、以及對應的說明文件，就像這樣：   
 <img src="5.png" />   
-因此，現在我們知道要使用`ggplot()`函式，需要先下載**`ggplot2`**套件。   
+因此，現在我們知道要使用`ggplot()`函式，需要先下載**`ggplot2`**套件。
 
-------
+既然知道套件名稱，那麼就要把套件下載下來，有兩種方式：
 
-既然知道套件名稱，那麼就要把套件下載下來。   
-下載R的套件有兩種方式：
-
-**[1] 用RStudio介面：**   
+##方法一：用RStudio介面{#P2-1-1} 
 在RStudio上點開「Tools」->「Install Packages」 ：
 <img src="6.png" />   
    
 在中間填入想要安裝的套件名稱，點「Install」就大功告成！
 <img src="7.png" />   
    
-**[2] 用R的函式(指令)：**   
+##方法二：用install.packages(){#P2-1-2} 
 直接在console裡面輸入函式`install.packages("套件名稱")`！
 <img src="8.png" />   
    
 ------
 
-###(2)匯入到R   
+##匯入套件{#P2-2}   
 當出現這樣的畫面，就代表安裝完成，這代表你已經把R的套件下載到電腦裡面了！    
 <img src="9.png" />   
  
@@ -250,7 +273,7 @@ ggplot(data=CO2) + geom_boxplot(data=CO2,aes(x=conc, y=uptake, colour=Plant))
 
 ------
 
-#**總結**
+#**總結**{#P3}
 套件和函式是R很重要的功能，但我們不可能記住所有的套件和對應的函式。   
 因此，**如何妥善運用google和說明文件**，是在R的學習之路上很重要的一環！   
 
@@ -260,7 +283,7 @@ It's still a long way to go~
 
 ------
 
-#**(額外) Happy White Day**
+#**(額外) Happy White Day**{#P4}
 今天恰好是3/14，祝大家白色情人節快樂！(<a href="http://stackoverflow.com/questions/8082429/plot-a-heart-in-r" target="_blank">R code from here</a>)
 ```{r}
 require(graphics)

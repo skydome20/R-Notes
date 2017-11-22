@@ -1,14 +1,25 @@
 ---
 title: "R筆記--(4)繪圖-資料視覺化"
-author: "skydome20 (skydome20@gmail.com)"
+author: "skydome20"
 date: "2016/04/05"
 output:
-  html_document:
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
     css: style.css
-  pdf_document: default
 ---
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
 
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>   
+------
+
+# 本篇目錄
+
+1. [Base Plotting System](#P1)
+2. [Lattice](#P2)
+3. [ggplot2](#P3)
+4. [儲存圖片成png,jpeg,bmp…](#P4) 
+5. [總結](#P5) 
+6. [(額外)資料視覺化的資源](#P6) 
    
 ------
 
@@ -45,7 +56,7 @@ output:
    
 在R裡面，主要有三個強大的繪圖系統(Plotting System)，可以幫助我們輕易達成「資料視覺化」的目的，以下將會一一介紹：   
    
-#**1. Base Plotting System**   
+#**1. Base Plotting System**{#P1}   
    
 看到Base這個單字，就知道這是R最基本、最核心的繪圖系統。   
    
@@ -192,7 +203,7 @@ plot(airquality$Solar.R, airquality$Ozone, main = "Solar.R to Ozone")
    
 ------
    
-#**2. Lattice**   
+#**2. Lattice**{#P2}    
 這是在R裡面第二個繪圖系統。   
    
 和Base Plotting System不同的是，Lattice的繪圖概念，並不是「兩階段」，而是直接一筆在圖上繪製所有的資訊。   
@@ -328,7 +339,7 @@ xyplot(x=Wind~Temp ,         # Wind放在Y軸，Temp放在X軸
    
 ------
    
-#**3. ggplot2**
+#**3. ggplot2**{#P3} 
 接下來要介紹的，是在R裡面最受歡迎的第三方繪圖套件：**ggplot2**。   
    
 `ggplot2`的繪圖概念，又和上面兩者不一樣，是基於**Grammar of Graphics**的想法，直譯來說，就是「圖形的文法」。     
@@ -572,7 +583,7 @@ ggplot(data=df) +
 
 ------
 
-#**4. 儲存圖片成png,jpeg,bmp...**   
+#**4. 儲存圖片成png,jpeg,bmp...**{#P4}    
 如今，你已經學會如何運用R的三個繪圖系統，來畫出自己想要的圖。   
    
 但當你用R畫完圖以後，它只存在於R裡面，無法自由存取。因此，我們必須把圖片儲存到自己的電腦上，這才是我們最終的目的。   
@@ -615,7 +626,7 @@ dev.off() #最後要關掉輸出圖片裝置
    
 ------
    
-#**總結**   
+#**總結**{#P5}    
    
 這篇筆記由簡到難，介紹了三種R的繪圖系統。我們可以用不同的繪圖系統，去繪製相同效果的圖表(當然，外觀上可能會不太一樣)。雖然內容很多，學起來不太容易，不過人畢竟是視覺的生物，好好掌握資料視覺化(繪圖)的技巧，在資料分析中是一項很重要的能力。   
 
@@ -624,7 +635,7 @@ It's still a long way to go~
   
 ------
    
-#**(額外)資料視覺化的資源**
+#**(額外)資料視覺化的資源**{#P6} 
    
 * 台灣資料科學愛好者年會的演講：<a href="http://www.slideshare.net/tw_dsconf/ss-60041639" target="_blank">[資料視覺化之理論、賞析與實作---投影片]</a>  (2016/03/26)   
   

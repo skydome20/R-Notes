@@ -1,13 +1,25 @@
 ---
 title: "R筆記--(10)遺漏值處理(Impute Missing Value)"
-author: "skydome20 (skydome20@gmail.com)"
+author: "skydome20"
 date: "2016/06/06"
 output: 
-  html_document:
-        css: style.css
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
+
+------
+
+# 本篇目錄
+
+1. [直接移除有遺漏值的資料](#P1)
+2. [用「平均數」、「第一四分位數」…來填補遺漏值](#P2)
+3. [用k-Nearest Neighbours填補遺漏值](#P3)
+4. [用MICE填補遺漏值](#P4)
+5. [總結](#P5)  
 
 ------
   
@@ -59,7 +71,7 @@ head(data)
 ------
   
 
-## 1. 直接移除有遺漏值的資料   
+## 1. 直接移除有遺漏值的資料{#P1}   
 
 ```{r}
 # 當一筆資料是完整的，回傳TRUE；當一筆資料有遺漏值，回傳FALSE
@@ -76,7 +88,7 @@ rm.data <- data[complete.cases(data), ]
 ------
   
 
-##2. 用「平均數」、「第一四分位數」...來填補遺漏值：   
+##2. 用「平均數」、「第一四分位數」...來填補遺漏值{#P2}   
 
 
 ```{r, warning=FALSE}
@@ -93,7 +105,7 @@ mean.data[na.rows, 1] <- mean.1
 ------
   
 
-##3. 用K-Nearest Neighbours填補遺漏值：   
+##3. 用K-Nearest Neighbours填補遺漏值{#P3}   
 
 K-Nearest Neighbours(KNN)運用在遺漏值填補上的想法很簡單：   
   
@@ -117,7 +129,7 @@ head(imputeData)
 ------
 
 
-##4. 用MICE填補遺漏值：   
+##4. 用MICE填補遺漏值{#P4}   
 
 在MICE裡面，提供了很多資料探勘的模型(linear regression, logistic regression, cart, random forest, boostrap......)，來針對遺漏值進行預測！   
 
@@ -161,7 +173,7 @@ head(df)
 ------   
 
    
-#**總結**    
+#**總結**{#P5}    
 
 在資料預處理時，「遺漏值處理」是很重要的步驟，最好還是選擇「填補遺漏值」的方式，才不會造成資訊損失。   
 

@@ -1,20 +1,26 @@
 ---
 title: "R筆記--(8)類神經網路(neuralnet)"
-author: "skydome20 (skydome20@gmail.com)"
+author: "skydome20"
 date: "2016/05/23"
 output: 
-  html_document:
-        css: style.css
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
 
 ------
-  
-本篇內容，會繼續介紹一些常用的資料探勘模型：   
-   
+
+# 本篇目錄
+
+1. [倒傳遞類神經網路(Backpropagation Neural Network)](#P1)
+2. [Tuning Parameters](#P2)
+3. [預測](#P3)
+4. [總結](#P4)
+
 ------
-   
 
 要使用(倒傳遞)類神經網路，R提供一個可以設定「多個隱藏層」的套件，叫做`neuralnet`。    
 
@@ -26,7 +32,7 @@ output:
 
 接下來，會以R內建的iris資料，進行「倒傳遞類神經網路(bpn)」的示範：
 
-#**(倒傳遞)類神經網路(Artificial Neural Network)**   
+#**倒傳遞類神經網路(Backpropagation Neural Network)** {#P1}
 
 首先，以下是必須安裝的套件：
 ```{r, message=FALSE, warning=FALSE}
@@ -82,7 +88,7 @@ plot(bpn)
 
 ------
 
-#**Tuning Parameters**   
+#**Tuning Parameters**{#P2}
 
 當使用不同的隱藏層數和節點數，類神經網路的模型表現與可靠度就會改變。   
 
@@ -156,7 +162,7 @@ plot(bpn)
 ------
 
 
-#**預測**   
+#**預測**    {#P3}
 
 接下來，就用訓練好的模型(bpn)預測test set：
 
@@ -207,7 +213,7 @@ table(real    = test$Species,
 
 ------
    
-#**總結**  
+#**總結**   {#P4}
 
 類神經網路是一個很強大的方法，屬於機器學習的範疇，因此在預測上有很好的效果，可是最大的問題則是難以解釋。   
    

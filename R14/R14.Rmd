@@ -1,28 +1,39 @@
 ---
 title: "R筆記 -- (14)Support Vector Machine/Regression(支持向量機SVM)"
-author: "skydome20 (skydome20@gmail.com)"
+author: "skydome20"
 date: "2017/07/09"
 output: 
-  html_document:
-        css: style.css
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
 
 ------
-  
-本篇內容，會繼續介紹一些常用的資料探勘模型：
 
-> * **0. 簡言**
-> * **1. Support Vector Machine(SVM)**：如何用SVM來分類(類別)。
-> * **2. SVM在多元分類(multi-class)的技巧**：介紹One-against-Rest和One-against-One的手法。
-> * **3. Support Vector Regression(SVR)**：如何用SVR來預測(連續)。
-> * **4. 參數討論**：討論SVM中的參數意義：Cost(C), Epsilon(ε), Gamma。
-> * **5. 參數調整(Tune Parameters)**：如何調整SVM的參數，讓模型表現出最佳狀態。
+# 本篇目錄
+
+0. [簡言](#P0)
+1. [Support Vector Machine(SVM)：如何用SVM來分類(類別)](#P1)
+2. [SVM在多元分類(multi-class)的技巧](#P2)
+    * [One-against-Rest](#P2-1)
+    * [One-against-One](#P2-2)
+3. [Support Vector Regression(SVR)：如何用SVR來預測(連續)](#P3)
+4. [參數討論](#P4)
+    * [C(cost)](#P4-1)
+    * [Epsilon (ε)](#P4-2)
+    * [Gamma](#P4-3)
+5. [參數調整(Tune Parameters)：如何調整SVM的參數，讓模型表現出最佳狀態](#P5)
+    * [Tune parameters in SVM(soft-margin)](#P5-1)
+    * [Tune parameters in SVR](#P5-2)
+6. [總結](#P6)
+7. [Reference](#P7)
    
 ------
 
-## 0. 簡言   
+## 0. 簡言{#P0}   
    
 今天要介紹的是<a href="http://www.cs.uvm.edu/~icdm/algorithms/10Algorithms-08.pdf" target="_blank">Top 10 algorithms in data mining</a>之中的SVM，也就是「支持向量機」，Support Vector Machine。   
 
@@ -56,7 +67,7 @@ require(e1071)
 
 ------
 
-## 1. Support Vector Machine(SVM)   
+## 1. Support Vector Machine(SVM) {#P1}  
 
 一直以來，SVM就是資料科學中最受歡迎的**分類**演算法之一。   
 
@@ -140,7 +151,7 @@ sum(diag(confus.matrix))/sum(confus.matrix)
 
 ------
 
-## 2. SVM在多元分類(multi-class)的技巧   
+## 2. SVM在多元分類(multi-class)的技巧{#P2}  
 
 在第1節，我們很輕易地針對一個具有七種類別(7 classes)的資料，使用一個`svm()`的函式就建完模了。   
 
@@ -163,7 +174,7 @@ sum(diag(confus.matrix))/sum(confus.matrix)
 
 在處理多元分類的問題時，最常用的是以下兩種解法/策略：
 
-### (1) One-against-Rest(One-vs-All, OvA, OvR)：一對多   
+### (1) One-against-Rest(One-vs-All, OvA, OvR)：一對多   {#P2-1}  
 
 這個策略的想法是，就是針對每一個類別，分別建立一個SVM(或其他二元分類器)：**屬於此類別的樣本視為(+1)，其他類別的樣本視為(-1)，如此一來，就轉換成一個二元分類的問題了！**    
 
@@ -187,7 +198,7 @@ sum(diag(confus.matrix))/sum(confus.matrix)
 
 ------
 
-### (2) One-against-One(OvO)：一對一   
+### (2) One-against-One(OvO)：一對一   {#P2-2} 
 
 這個策略的想法，很像高中數學的排列組合：**從T種類別中任取2種類別，共會有幾種組合？**   
 
@@ -229,7 +240,7 @@ sum(diag(confus.matrix))/sum(confus.matrix)
 
 ------
 
-## 3. Support Vector Regression(SVR)   
+## 3. Support Vector Regression(SVR)   {#P3}
 
 SVR是本來SVM的延伸型態，能夠處理連續的預測問題。   
 
@@ -305,7 +316,7 @@ c(sqrt(mean((data$y - lm.pred)^2)),
 
 ------
 
-## 4. 參數討論   
+## 4. 參數討論   {#P4}
 
 對我來說，這一小節是最重要的部分！   
 
@@ -344,7 +355,7 @@ svm(...
 
 ------
 
-### ‧**C(cost)**
+### **C(cost)**{#P4-1}
 
 一開始的SVM，是要尋找一個能夠完美將「所有」資料分成兩邊，具有最大margin的超平面，這又被稱為"hard-margin SVM"。
 
@@ -392,7 +403,7 @@ plot(x=1:1000, y=num.SV, xlab="C value", ylab="# of support vectors", pch=16, ce
 
 ------   
 
-### ‧**Epsilon (ε)**
+### **Epsilon (ε)**{#P4-2}
 
 這個參數主要影響的會是SVR，而非SVM。因為在SVR的損失函數中，使用的是epsilon intensive hinge loss。
 
@@ -440,7 +451,7 @@ plot(x=seq(0,1,0.01), y=RMSE, xlab="ε value", ylab="RMSE", pch=16, cex=.5, main
 
 ------   
 
-### ‧**Gamma**
+### **Gamma**{#P4-3}
 
 這是用在kernel function中的參數，主要是polynomial、radial basis(RBF)和sigmoid。   
 
@@ -505,7 +516,7 @@ legend("bottomright", pch = 16, col = c("red","blue"),legend=c("Train-Accuracy",
 
 ------
 
-## 5. 參數調整(Tune Parameters)   
+## 5. 參數調整(Tune Parameters){#P5}
 
 在調參數的階段，所使用的手法被稱為grid search，概念是針對每一種參數組合，都會訓練一個對應的模型，最後觀察模型的表現，挑出表現最佳的模型。
 
@@ -513,7 +524,7 @@ legend("bottomright", pch = 16, col = c("red","blue"),legend=c("Train-Accuracy",
 
 在`e1071`的套件裡，有內建`tune()`的函式可以讓我們來調參數。
 
-###‧**Tune parameters in SVM(soft-margin)**
+###**Tune parameters in SVM(soft-margin)**{#P5-1}
 
 在SVM中，一般會去調的參數是(cost, gamma)：
 
@@ -558,7 +569,7 @@ tune.model$best.model
 
 <br></br>
 
-###‧ **Tune parameters in SVR**
+### **Tune parameters in SVR**{#P5-2}
 
 在SVR中，一般會去調的參數是(cost, epsilon)：
 
@@ -595,7 +606,7 @@ tune.model$best.model
 
 ------   
 
-#**總結**  
+#**總結**{#P6}  
 
 SVM是資料科學中最重要的演算法之一，它同時具有機器學習和統計理論的長處，在分類及預測的問題上都表現得不錯。
 
@@ -611,27 +622,16 @@ It's still a long way to go~
 ------   
 
 
-#**Reference**  
+#**Reference**{#P7}  
 
 <a href="https://www.youtube.com/user/hsuantien/videos" target="_blank">林軒田-機器學習技法</a>   
-
 <a href="http://www.cmlab.csie.ntu.edu.tw/~cyy/learning/tutorials/SVM2.pdf" target="_blank">Support Vector Machines 
 簡介(林宗勳)</a>  
-
 <a href="https://goo.gl/qt57Z6" target="_blank">逍遙工作室-支持向量機</a>   
-
 <a href="https://goo.gl/E9eRFm" target="_blank">逍遙工作室-非線性支持向量機(non-linear SVMs)</a>  
-
 <a href="https://www.svm-tutorial.com/2014/11/svm-classify-text-r/" target="_blank">SVM Tutorial: How to classify text in R </a>   
-
 <a href="https://www.svm-tutorial.com/2014/10/support-vector-regression-r/" target="_blank">SVM Tutorial: Support Vector Regression with R </a>   
-
 <a href="https://www.youtube.com/watch?v=m2a2K4lprQw" target="_blank"> SVM Gamma Parameter  </a>   
-
 <a href="http://blog.fukuball.com/lin-xuan-tian-jiao-shou-ji-qi-xue-xi-ji-fa-machine-learning-techniques-di-3-jiang-xue-xi-bi-ji/" target="_blank"> 林軒田教授機器學習技法 Machine Learning Techniques 第 3 講學習筆記 </a>   
-
 <a href="https://hal.archives-ouvertes.fr/inria-00103955/document" target="_blank">  ”One Against One” or ”One Against All”: Which One is Better for Handwriting Recognition with SVMs?</a>   
-<a href=" " target="_blank">  </a>
-<a href=" " target="_blank">  </a>
-
 <a href="http://www.svms.org/parameters/" target="_blank">SVM Parameters</a>

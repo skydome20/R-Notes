@@ -1,21 +1,51 @@
 ---
 title: "R筆記--(6)關聯式規則；決策樹(分析鐵達尼號資料)"
-author: "skydome20 (skydome20@gmail.com)"
+author: "skydome20"
 date: "2016/04/27"
 output: 
-  html_document:
-        css: style.css
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>   
+
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
 
 ------
-  
-本篇內容，會繼續介紹一些常用的資料探勘模型：   
-   
+
+# 本篇目錄
+
+1. [關聯式規則(Association Rules)](#P1)
+    * [apriori()建立關聯規則](#P1-1)
+    * [冗規則判斷與去除](#P1-2)
+    * [交集，聯集，否定](#P1-3)
+2. [決策樹(Decision Tree)](#P2)
+    * [rpart()建立決策樹](#P2-1)
+    * [視覺化](#P2-2)
+    * [預測](#P2-3)
+3. [總結](#P3)
+4. [Reference](#P4)  
+
 ------
    
-#**1. 關聯式規則(Apriori)**   
+#**Version Requirement**   
+   
+這篇筆記是在此版本的狀態撰寫的：
+
+> * R-3.2.5     
+> * `arules` package = 1.4-2   
+   
+(2017-04-24)    
+新增以下版本的撰寫方式：   
+
+> * R-3.4.0
+> * `arules` package = 1.5-2 
+  
+
+------
+   
+#**1. 關聯式規則(Association Rules)**{#P1}   
    
 這裡拿網路上一個公開資料(鐵達尼號的乘客資料)來進行分析，<a href="http://www.rdatamining.com/data/titanic.raw.rdata?attredirects=0&d=1" target="_blank">資料載點如下</a>。   
 
@@ -59,8 +89,12 @@ str(titanic.raw)
 啊啊啊！腦袋卡住了......   
 
 
-好啦，就不賣關子了。事實上這件事其實並不難，其中一個方法，就是本篇即將用到的第一個方法：**關聯式法則(apriori)**！(對應的套件：`arules`)
-   
+好啦，就不賣關子了。事實上這件事其實並不難。
+
+其中一個方法，就是本篇即將用到的第一個方法：**關聯式法則(apriori)**！(對應的套件：`arules`)
+
+## apriori()建立關聯規則{#P1-1}
+
 ```{r, message=F, warning=F, results='hide'}
 require(arules) # apriori關聯式法則的套件
 
@@ -106,6 +140,9 @@ inspect(sort.rule)
 
 看第一個關聯規則：「若身分是成人女性 => 則會存活」，lift=2.3 > 1，表示預測結果比原本表現好。   
 
+## 冗規則判斷與去除{#P1-2}
+
+
 然而，有發現到問題嗎？   
    
 第六個關聯規則(#編號8)「若身分是男性成人船員 => 不會存活」，對比於第五個關聯規則(#編號4)：「若身分是男性船員 => 不會存活」，其實看不到任何有用的資訊！   
@@ -114,10 +151,16 @@ inspect(sort.rule)
    
 多餘的關聯法則，會造成分析上的雜訊，因此需要刪除它們，但該怎麼做呢？   
    
-首先，先看某項規則是否為其他規則的子集(subset)：
+首先，先看某項規則是否為其他規則的子集(subset)：(註，因套件版本的問題，函式回傳的矩陣有所改變，因此下面提供兩種不同的寫法，請依據自己的套件版本來撰寫)   
+
 ```{r}
+# 'arules' version = 1.4-2 , under R-3.2.5
 subset.matrix <- is.subset(x=sort.rule, y=sort.rule)
+
+# 'arules' version = 1.5-2 , under R-3.4.0
+subset.matrix <- as.matrix(is.subset(x=sort.rule, y=sort.rule))
 ```
+
 輸出的格式會像這樣：
 
 <img src="2.png" />   
@@ -140,6 +183,9 @@ inspect(sort.rule)
 ```
 經過以上步驟後，多餘的規則消失了！   
 
+
+## 視覺化{#P1-3}
+
 在R裡面，關聯式規則還提供一個視覺化的套件`arulesViz`，可以觀察每條規則的三項指標分布情況：
 
 ```{r,message=F, warning=F }
@@ -160,11 +206,12 @@ plot(sort.rule, method="grouped")
    
 ------
    
-#**2. 決策樹(Decision Tree)**   
+#**2. 決策樹(Decision Tree)**{#P2}   
 
 無論在分類或預測上，決策樹的演算法都有很好的效果。   
    
 但它最強大的地方，莫過於樹狀分支的結構：可以明顯呈現分類的規則！與一些機器學習的方法(NN, SVM...)相比，相當容易進行解釋，以及分析規則之間的關係。   
+## rpart()建立決策樹{#P2-1}
 
 這裡就簡單用CART決策樹來練習，對應的套件是`rpart`，一樣使用剛才鐵達尼號的資料：
 ```{r, message=F,warning=F}
@@ -180,6 +227,9 @@ test <- titanic.raw[-train.index, ]
 cart.model<- rpart(Survived ~. , 
                     data=train)
 ```   
+
+
+## 視覺化{#P2-2}
 
 要畫出決策樹(視覺化)，雖然用平常的`plot()`就可以達成   
    
@@ -222,8 +272,10 @@ prp(cart.model,         # 模型
 
 **(OS：男生好可憐QHQ 這個社會好現實QHQ)**   
 
-------
-   
+
+## 預測{#P2-3}
+
+ 
 有決策樹之後，就要進行預測啦！   
    
 還記得在線性迴歸使用過的`predict()`嗎？這時就會派上用場囉(在這裡，會同時計算預測準確率)：    
@@ -241,7 +293,7 @@ sum(diag(confus.matrix))/sum(confus.matrix) # 對角線的數量/總數量
    
 ------
    
-#**總結**  
+#**總結**{#P3}  
 
 和一些機器學習方法只會專注在「預測準確率」的概念不太一樣，，關聯式法則和決策樹在「解釋」上具有十分強大的優勢。   
 
@@ -257,7 +309,7 @@ It's still a long way to go~
 
 ------
    
-#**Reference**  
+#**Reference**{#P4}  
 
 <a href="http://www.rdatamining.com/examples/association-rules
 " target="_blank">http://www.rdatamining.com/examples/association-rules

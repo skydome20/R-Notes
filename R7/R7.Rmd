@@ -1,19 +1,33 @@
 ---
 title: "R筆記--(7)主成份分析(2012美國職棒MLB)"
-author: "skydome20 (skydome20@gmail.com)"
+author: "skydome20"
 date: "2016/05/23"
 output: 
-  html_document:
-        css: style.css
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
 
 ------
-  
-本篇內容，會繼續介紹一些常用的資料探勘模型：   
-   
+
+# 本篇目錄
+
+1. [主成份分析](#P1)
+2. [選擇多少個主成份？](#P2)
+    * [陡坡圖(Scree plot)-凱莎原則](#P2-1)
+    * [累積解釋圖(Pareto plot)](#P2-2)
+3. [主成份負荷 (主成份和原變數的關係)](#P3)
+    * [第一主成份](#P3-1)
+    * [第二主成份](#P3-2)
+    * [第三主成份](#P3-3)
+4. [總結](#P4)   
+5. [Reference](#P5) 
+
 ------
+
    
 #**主成份分析(Principal Component Analysis)**   
    
@@ -29,7 +43,7 @@ output:
 
 * biplot()：繪製主成份負荷圖(PCA loadings plot)    
    
-## 1. 主成份分析
+## 1. 主成份分析{#P1}
 當下載好資料後，第一步便是先讀取資料：
 ```{r}
 data <- read.csv("2012MLB.csv",  # 資料檔名 
@@ -53,13 +67,13 @@ pca
 
 * Rotation：特徵向量，也就是各個主成份，所對應的線性組合(linear combination)的係數   
 
-## 2. 選擇多少個主成份？   
+## 2. 選擇多少個主成份？{#P2}   
 
 當主成份算出來以後，接下來要做的是「選擇幾個主成份」！   
 
 我們可以繪製「陡坡圖Scree plot」以及「累積解釋圖Pareto plot」：
 
-### ‧陡坡圖(Scree plot)   
+### 陡坡圖(Scree plot)-凱莎原則{#P2-1}   
 
 ```{r}
 # 使用plot()函式
@@ -74,7 +88,7 @@ abline(h=1, col="blue") # Kaiser eigenvalue-greater-than-one rule
 根據**凱莎原則**，特徵值大於1的主成份就可以選取；而且第三個以後的主成份變異趨於平緩，因此選擇**前三個主成份**是比較好的選擇。    
 
 
-### ‧累積解釋圖(Pareto plot)   
+### 累積解釋圖(Pareto plot){#P2-2}  
 這裡就比較複雜，需要進行四個步驟：
 
 1. 求出每個主成份的特徵值(也就是variance = std^2)   
@@ -114,7 +128,7 @@ top3_pca.data <- pca$x[, 1:3]
 top3_pca.data 
 ```
 
-## 3. 主成份負荷 (主成份和原變數的關係)  
+## 3. 主成份負荷 (主成份和原變數的關係){#P3}  
 
 每一個主成份，都是**原變數經過線性組合**後產生的值。   
 
@@ -140,7 +154,7 @@ third.pca <- top3.pca.eigenvector[, 3]   #  第三主成份
 
 (以下有用到**排序**的技巧，可以參考<a href="http://www.rpubs.com/skydome20/R-Note3-function_and_package" target="_blank">前篇筆記</a> 內的`order(), sort()`)   
 
-### ‧第一主成份：   
+### 第一主成份{#P3-1}   
 
 **SB(盜壘)、BB(四壞球)與PC-1呈現正相關**，看起來和「上壘」有關。
 ```{r}
@@ -154,7 +168,7 @@ dotchart(first.pca[order(first.pca, decreasing=FALSE)] ,   # 排序後的係數
 ```     
    
    
-### ‧第二主成份：   
+### 第二主成份{#P3-2}   
 **HR(全壘打)、BB(四壞球)、RBI(打點)與PC-2呈現正相關**，看起來和「打擊者」有關。   
 ```{r}
 # 第二主成份：由小到大排序原變數的係數
@@ -167,7 +181,7 @@ dotchart(second.pca[order(second.pca, decreasing=FALSE)] ,  # 排序後的係數
 ```     
    
 
-### ‧第三主成份：   
+### 第三主成份{#P3-3}   
 **H1B(一壘安打)、H2B(二壘安打)與PC-3呈現正相關**，看起來和「安打」有關。
 
 ```{r}
@@ -205,7 +219,7 @@ biplot(pca, choices=1:2)
 
 ------
    
-#**總結**  
+#**總結**{#P4}  
 
 本篇筆記以2012美國的職棒資料進行主成份分析，練習如何挑選幾個主成份，並且根據主份負荷進行解釋上的探討。
 
@@ -213,7 +227,7 @@ biplot(pca, choices=1:2)
 
 It's still a long way to go~   
    
-#**Reference**  
+#**Reference**{#P5}  
 本篇筆記參考<a href="https://sites.google.com/site/rlearningsite/factor/pca" target="_blank">R的世界-主成分分析</a>製作而成。  
 
 

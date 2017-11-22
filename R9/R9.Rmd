@@ -1,18 +1,32 @@
 ---
 title: "R筆記--(9)分群分析(Clustering)"
-author: "skydome20 (skydome20@gmail.com)"
+author: "skydome20"
 date: "2016/06/06"
 output: 
-  html_document:
-        css: style.css
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>  
+
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
 
 ------
-  
-本篇內容，會繼續介紹一些常用的資料探勘模型：   
-   
+
+# 本篇目錄
+
+1. [階層式分群(Hierarchical Clustering)](#P1)
+2. [切割式分群(Partitional Clustering)](#P2)
+    * [K-Means](#P2-1)
+    * [K-Medoid](#P2-2)
+3. [分群的最佳數目(Optimal number of clusters)](#P3)
+    * [Elbow Method](#P3-1)
+    * [Average Silhouette Method](#P3-2)
+4. [總結](#P4)
+5. [Reference](#P5)  
+
+
 ------
    
 在分群分析中，主要可以分成兩種類型：
@@ -24,7 +38,7 @@ output:
 
 ------
 
-## 1. 階層式分群(Hierarchical Clustering)   
+## 1. 階層式分群(Hierarchical Clustering){#P1}   
 
 這裡使用`iris`的資料：
 ```{r}
@@ -61,8 +75,6 @@ plot(h.E.cluster, xlab="歐式距離")
 h.M.cluster <- hclust(M.dist) 
 plot(h.M.cluster, xlab="曼哈頓距離")
 ```   
-      
-------
    
    
 當我們有了「距離矩陣」後，要如何把資料結合起來，不同的方法也會產生不同的效果。   
@@ -120,11 +132,11 @@ table(cut.h.cluster, iris$Species)       # 分群結果和實際結果比較
 
 ------
 
-## 2. 切割式分群(Partitional Clustering)   
+## 2. 切割式分群(Partitional Clustering){#P2}   
 
 在切割式分群裡，最常見就是**K-Cluster**的方法，並且根據分群條件的不同，可以分成：
 
-###1. K-Means   
+###K-Means{#P2-1}   
 使用函式是`kmeans()`：
 
 ```{r, message=FALSE}
@@ -146,7 +158,7 @@ fviz_cluster(kmeans.cluster,           # 分群結果
 
 ```   
 
-###2. K-Medoid      
+###K-Medoid{#P2-2}      
 使用函式是`pam()`，在`cluster`這個套件裡面：
 ```{r, message=FALSE}
 require(cluster)
@@ -170,7 +182,7 @@ fviz_cluster(kmedoid.cluster,       # 分群結果
 
 ------
 
-##3. 分群的最佳數目(Optimal number of clusters)      
+##3. 分群的最佳數目(Optimal number of clusters){#P3}      
    
    
 如今，你已經學會**階層式分群**和**切割式分群**的R語言要怎麼寫了！   
@@ -181,7 +193,7 @@ fviz_cluster(kmedoid.cluster,       # 分群結果
 ------
    
 
-###(1)**Elbow Method**    
+###**Elbow Method**{#P3-1}    
 
 要解決這個問題，我們先回顧一下分群的目的，就是「使群內的總變異最小；使群間的總變異最大」，是吧？   
 
@@ -235,13 +247,11 @@ geom_vline(xintercept = 3,       # 在 X=3的地方
            linetype = 2)         # 畫一條垂直虛線
     
 
-```   
-
+``` 
    
 ------
-   
 
-###(2)**Average Silhouette Method**    
+###**Average Silhouette Method**{#P3-2}    
 
 除了計算SSE以外，另一個衡量分群效果的方法，稱為平均側影法(Average silhouette Method)。  
 
@@ -283,21 +293,10 @@ labs(title="Avg.Silhouette Method for K-Means")
 
 提問：為什麼這個方法建議分2群呢？(提示：和原始資料的分布型態有關。)   
 
-   
-------
-   
-
-###(4)**SOM()**    
-
-```{r}
-require(SOMbrero)
-
-
-```
 
 ------   
 
-#**總結**  
+#**總結**{#P4}  
 
 分群(Clustering)屬於非監督式學習，主要根據資料本身的特性，來進行資料分析的一種方法。   
 
@@ -308,11 +307,8 @@ require(SOMbrero)
 
 It's still a long way to go~   
 
-
-
 ------   
 
-
-#**Reference**  
+#**Reference**{#P5}  
 本篇筆記參考<a href="http://www.sthda.com/english/wiki/determining-the-optimal-number-of-clusters-3-must-known-methods-unsupervised-machine-learning#three-popular-methods-for-determining-the-optimal-number-of-clusters" target="_blank">Determining the optimal number of clusters: 3 must known methods - Unsupervised Machine Learning </a>、
 以及<a href="https://cran.r-project.org/web/packages/SOMbrero/vignettes/doc-numericSOM.html" target="_blank">Using Self-Organizing Maps with SOMbrero to cluster a numeric dataset</a>製作而成。 

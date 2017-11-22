@@ -1,31 +1,42 @@
 ---
 title: "R筆記 – (13) 網路爬蟲(Crawler)：用xml2爬美國中情局(CIA)的解密文件資料庫"
-author: "skydome20 (skydome20@gmail.com)"
+author: "skydome20"
 date: "2017/01/31"
 output: 
-  html_document:
-        css: style.css
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
 ---
 
-<a href="http://rpubs.com/skydome20/Table" target="_blank">【R系列筆記】</a>    
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
 
+------
+
+# 本篇目錄
+
+0. [前言](#P0)
+1. [解析CIA (CREST project)的網址](#P1)
+2. [用xml2解析CIA搜尋結果的資訊](#P2)
+    * [(1) 解密文件的「標題」和對應的「超連結」](#P2-1)
+    * [(2) 共有「多少」搜尋結果](#P2-2)
+    * [(3) 共有「幾頁」搜尋結果](#P2-3)
+3. [下載解密文件](#P3)
+4. [進階：自動化整個流程(成果展現)](#P4)
+    * [basic.info.query.CIA_CREST(query)](#P4-1)
+    * [parsing.pages.CIA_CREST(query, pages)](#P4-2)
+    * [download.doc.CIA_CREST(parse.table)](#P4-3)
+5. [總結](#P5)
+6. [Reference](#P6)
 
 ------   
    
    
-#**0. 前言**   
-   
+#**0. 前言**{#P0}
 > (本篇筆記適合對網路爬蟲有一定概念的人；若不懂相關知識，最後的Reference有提供一些學習資源，請先看過後再來閱讀。)     
 >      
 > 本篇筆記的<a href="https://github.com/skydome20/crawler_CIA_CREST" target="_blank">程式碼已經在Github上釋出。</a>     
->   
-> * 0. 前言 
-> * 1. 解析CIA (CREST project)的網址。
-> * 2. 用xml2解析CIA搜尋結果的資訊。
-> * 3. 下載解密文件。
-> * 4. 進階：自動化整個流程(成果展現)。    
    
-------   
 
 2017/01/18，美國中央情報局(CIA)做出一件讓全世界驚奇的事情，就是把93萬份解密文件釋出到官網上，供社會大眾自由下載查閱。此事立刻讓各國媒體相繼報導：   
    
@@ -74,7 +85,7 @@ output:
 
 ------   
 
-#**1. 解析CIA (CREST project)的網址**   
+#**1. 解析CIA (CREST project)的網址**{#P1}   
     
 在輸入關鍵字搜尋解密文件時，CIA的網站有一個很明顯的改變：   
    
@@ -129,7 +140,7 @@ result.urls
    
 ------   
    
-#**2. 用xml2解析CIA搜尋結果的資訊**   
+#**2. 用xml2解析CIA搜尋結果的資訊**{#P2}   
 
 有了結果網址後，我們可以用瀏覽器(browser)打開，觀察CIA結果的網頁中，有哪些資訊可能是我們需要的：   
 
@@ -163,7 +174,7 @@ result.urls[1]
 ------   
 
 
-###**(1) 解密文件的「標題」和對應的「超連結」。**   
+###**(1) 解密文件的「標題」和對應的「超連結」。**{#P2-1}   
    
 將滑鼠移動到解密文件的標題時，會出現下面這個現象：   
     
@@ -211,7 +222,7 @@ tail(page.info)
 ------   
 
 
-###**(2) 共有「多少」搜尋結果**   
+###**(2) 共有「多少」搜尋結果**{#P2-2}   
    
 將滑鼠移動到呈現多少筆搜尋結果的元素上時，會出現下面這個現象：   
     
@@ -242,7 +253,7 @@ xml_text(target)
 ------   
 
 
-###**(3) 共有「幾頁」搜尋結果**   
+###**(3) 共有「幾頁」搜尋結果**{#P2-3}   
    
 將滑鼠移動到最下面的「last」元素上時，會出現下面這個現象：   
     
@@ -277,7 +288,7 @@ strsplit(last.page.url, split="page=")[[1]][2]
    
 ------   
 
-#**3. 下載解密文件**   
+#**3. 下載解密文件**{#P3}   
 
 上一步，我們每一個解密文件的「標題」與「超連結」，接下來就是如何用R來下載這些解密文件。   
    
@@ -325,7 +336,7 @@ download.file(doc.url, '1_CIA_file.pdf', method='auto', mode='wb')
    
 ------   
 
-#**4. 進階：自動化整個流程(成果展現)**   
+#**4. 進階：自動化整個流程(成果展現)**{#P4}   
 
 前面1~3章的重點，主要著重在如何用R來解析CIA的網站，實作出一些基本的程式碼。   
    
@@ -499,14 +510,14 @@ download.doc.CIA_CREST <- function(parse.table){
 ------   
 
 
-## (1) 一開始先匯入`crawler_CIA_CREST.R`：   
+先匯入`crawler_CIA_CREST.R`  
 
 ```{r, eval=F}
 source("crawler_CIA_CREST.R")
 ```
 
 
-## (2) basic.info.query.CIA_CREST(query)   
+## basic.info.query.CIA_CREST(query){#P4-1}
    
 這個函式會初步解析搜尋結果的頁面，顯示相關資訊出來，讓使用者能夠先得知自己想要查詢關鍵字的資訊。   
    
@@ -527,7 +538,7 @@ basic.info.query.CIA_CREST(query = "Kennedy")
 有了上面的資訊後，我們就知道要搜尋的主題中，頁碼的限制範圍是多少(例如，Kennedy是0~842頁)。   
    
 
-## (3) parsing.pages.CIA_CREST(query, pages)   
+## parsing.pages.CIA_CREST(query, pages){#P4-2}
 
 考量到有時候並不需要下載「所有」的解密文件，或許只要「前十頁」的解密文件就好。   
 
@@ -564,7 +575,7 @@ parse.table = parsing.pages.CIA_CREST(your.query, page.nums)
    
 如果想要下載這些解密文件，那就要用到最後一個函式。   
 
-## (4) download.doc.CIA_CREST(parse.table)   
+## download.doc.CIA_CREST(parse.table){#P4-3}   
    
 將上一個函式回傳的parse.table，當作參數，這個函式會自動開始下載所有的解密文件(.pdf)到相對路徑的資料夾內。
 
@@ -610,7 +621,7 @@ referece.table = download.doc.CIA_CREST(parse.table)
 
 ------
     
-#**總結**    
+#**總結**{#P5}    
 
 作為資料科學家，有時候要自己去蒐集資料，網路爬蟲是常用的手法之一。   
    
@@ -628,7 +639,7 @@ It's still a long way to go~
 ------   
    
    
-#**Reference**    
+#**Reference**{#P6}    
 
 * 大數學堂 : <a href="http://www.largitdata.com/course/1/" target="_blank">什麼是網路爬蟲?</a>   
 
