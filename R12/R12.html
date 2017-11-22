@@ -268,7 +268,7 @@ drop2 &lt;-<span class="st"> </span><span class="kw">mx.symbol.Dropout</span>(<s
 
 <span class="co"># 輸出層：因為預測數字為0~9共十個，節點為10</span>
 output &lt;-<span class="st"> </span><span class="kw">mx.symbol.FullyConnected</span>(drop2, <span class="dt">name=</span><span class="st">&quot;output&quot;</span>, <span class="dt">num_hidden=</span><span class="dv">10</span>)
-<span class="co"># Loss Function: Softmax</span>
+<span class="co"># Transfer the Evidence to Probability by Softmax-function</span>
 dnn &lt;-<span class="st"> </span><span class="kw">mx.symbol.SoftmaxOutput</span>(output, <span class="dt">name=</span><span class="st">&quot;dnn&quot;</span>)</code></pre></div>
 <blockquote>
 <p>【註】<br />
@@ -411,7 +411,7 @@ fc.act1 &lt;-<span class="st"> </span><span class="kw">mx.symbol.Activation</spa
 
 <span class="co"># 輸出層：因為預測數字為0~9共十個，節點為10</span>
 output &lt;-<span class="st"> </span><span class="kw">mx.symbol.FullyConnected</span>(<span class="dt">data=</span>fc.act1, <span class="dt">num_hidden=</span><span class="dv">10</span>, <span class="dt">name=</span><span class="st">&quot;output&quot;</span>)
-<span class="co"># Loss Function: Softmax </span>
+<span class="co"># Transfer the Evidence to Probability by Softmax-function</span>
 cnn &lt;-<span class="st"> </span><span class="kw">mx.symbol.SoftmaxOutput</span>(<span class="dt">data=</span>output, <span class="dt">name=</span><span class="st">&quot;cnn&quot;</span>)</code></pre></div>
 <p>我們一樣可以看CNN裡面參數的資訊，和視覺化其結構：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 神經網路中的各個參數的資訊</span>

@@ -229,7 +229,7 @@ drop2 <- mx.symbol.Dropout(data=act2, p=0.5)
 
 # 輸出層：因為預測數字為0~9共十個，節點為10
 output <- mx.symbol.FullyConnected(drop2, name="output", num_hidden=10)
-# Loss Function: Softmax
+# Transfer the Evidence to Probability by Softmax-function
 dnn <- mx.symbol.SoftmaxOutput(output, name="dnn")
 ```   
 > 【註】   
@@ -405,7 +405,7 @@ fc.act1 <- mx.symbol.Activation(data=fc1, act_type="tanh", name="1-fc.act")
 
 # 輸出層：因為預測數字為0~9共十個，節點為10
 output <- mx.symbol.FullyConnected(data=fc.act1, num_hidden=10, name="output")
-# Loss Function: Softmax 
+# Transfer the Evidence to Probability by Softmax-function
 cnn <- mx.symbol.SoftmaxOutput(data=output, name="cnn")
 ```
    
