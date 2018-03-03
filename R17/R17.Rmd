@@ -1,0 +1,221 @@
+---
+title: "R筆記 -- (17)獨立成份分析(ICA)"
+author: "skydome20"
+date: "2018/03/03"
+output: 
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
+---
+
+
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
+
+
+#### Co-authors: <a href="https://rpubs.com/jeff_datascience/DS_Notebook" target="_blank">Jeff Hung</a>
+
+
+------
+
+# 本篇目錄
+
+0. [簡言](#P0)
+1. [獨立成份分析](#P1)
+2. [ICA-訊號處理](#P2)
+    * [模擬雞尾酒會](#P2-1)
+    * [FastICA-Algorithm](#P2-2)
+    * [選擇多少個來源訊號的數量？](#P2-3)    
+3. [總結](#P3)
+4. [Reference](#P4)
+5. [R and packages version](#P5)
+
+------
+
+## 0. 簡言{#P0}   
+
+在談論有關於降維(Dimension Reduction)的方法時，獨立成份分析(Independent Component Analysis, ICA)跟主成份分析(Principal Component Analysis)常常會一起被討論。
+
+先回想一下，所謂的主成份分析(PCA)，就是將手中的原始資料，從高維空間投影到低維空間，期望此投影資料在低維空間中具有最大的變異(Variance)。做法上，會利用特徵值跟特徵向量，將原始變數(original variables)做線性組合(linear combination)，所產生的components便能最大化解釋原始資料的變異量。
+
+而獨立成份分析(ICA)，會先假設手中的資料其實有經過混合(例如，多個彼此獨立的分配，混合成手中的資料)，因此期望能夠從手中的資料，回推出是哪些獨立的分配。
+
+若以食物來比喻，就是你現在正在品嘗一道菜，並試圖辨識出裡面使用了哪些調味料跟哪些食材。
+
+兩種都是屬於降維的方法，但概念上截然不同。若以食物比喻兩者概念的話：
+
+1. 主成份分析(PCA)：「你現在手中有各種調味料跟食材，那要如何搭配比例，才能做出最美味的一道菜」；
+
+2. 獨立成份分析(ICA)：「你現在正在品嘗一道菜，並試圖辨識出裡面使用了哪些調味料跟哪些食材。」
+
+當然，降維的方法還有很多：SVD，LLE，LDA，QDA，Laplacian Eigenmaps，t-SNE...等等，日後有機會再討論。
+
+------
+
+## 1. 獨立成份分析{#P1}
+
+當你開始研究ICA時，一定會知道的案例就是「雞尾酒會問題(Cocktail-Party Problem)」。
+
+這個問題本來是源自於心理學，他們稱作「<a href="https://info.babyhome.com.tw/article/1688" target="_blank">雞尾酒會效應</a>」，研究的是人類為何能在一片吵雜的雞尾酒會中，依然能專注於自己想聽的那個談話，或是某些特殊聲音(例如，遠方忽然有人用自己的母語在交談)。這個問題從心理學、聽覺、以及腦科學的角度，解釋人類的「聽力選擇能力」。
+
+來到電腦科學的時代時，人類就開始好奇，有沒有辦法也讓電腦獲得這種辨識能力？基於此動機，並搭配統計學的理論，所發展出來的模型就是獨立成份分析(ICA)，其概念基本上可以用下圖來解釋：
+
+<center><img src="1.png"></center>   
+
+在做資料分析時，手上的資料**x**基本上都是「蒐集而來的」，也就是對應圖中的「麥克風」。
+
+「麥克風」所蒐集到的資料，可以視為從多個來源(Soucre, **s**)而來，並且經過某些疊加/組合的過程(**A**)，最後成為最後手中的資料(**x**)，所以可以寫成以下公式：``x = As``。
+
+ICA的做法，就是試圖「從**x**回推到**s**」。
+
+------
+
+## 2. ICA-訊號處理{#P2}
+
+
+### 模擬雞尾酒會{#P2-1}
+
+首先，我們就先模擬一下雞尾酒會的簡化版：「只有兩個音源，以及兩支麥克風。」
+
+先產生兩組原始音源訊號(**S**)，分別是sin函數跟鋸齒函數。
+
+```{r}
+S <- cbind(sin((1:1000)/20), 
+           rep((((1:200)-100)/100), 5)
+           )
+
+par(mfcol = c(1, 2))
+plot(1:1000, S[,1], type = "l",xlab = "S1", ylab = "")   # sin函數
+plot(1:1000, S[,2], type = "l", xlab = "S2", ylab = "")  # 鋸齒函數
+```
+
+接著建構一個混合矩陣(A)，可以想像這是混合這兩組訊號的權重。
+
+```{r}
+# Mixing matrix (混合矩陣)
+A <- matrix(c(0.291, 0.6557, -0.5439, 0.5572), 2, 2)
+A
+```
+
+這時，可以想像有兩支麥克風接收混合後的新訊號，也就是**X**：
+
+```{r}
+# 新訊號
+X <- S %*% A   
+
+par(mfcol = c(1, 2))
+plot(1:1000, X[,1], type = "l",xlab = "X1", ylab = "")
+plot(1:1000, X[,2], type = "l", xlab = "X2", ylab = "")
+```
+
+------
+
+### FastICA-Algorithm{#P2-2}
+
+<a href="https://www.cs.helsinki.fi/u/ahyvarin/papers/fastica.shtml" target="_blank">FastICA</a> 是由 Aapo Hyvärinen 所提出， 如今最廣泛、也最有效率的獨立成份分析演算法。
+
+在使用時，提到有兩個強假設要遵守(詳情請參閱上面之資源)：
+
+1. 來源訊號/資料間彼此之間獨立
+
+2. 來源訊號/資料不可以為常態分布
+
+由於 FastICA 在運算時，會使用最大化的kurtosis(峰度)來判斷來源訊號/資料，因此常態分布的資料 kurtosis 為 0 ，在運算上就會被自動排除。至於獨立的部份，想必不用多說。
+
+在R的操作上，剛好就有`fastICA`套件可以實踐此演算法：
+
+```{r, message=FALSE}
+require(fastICA)
+```
+
+再來，只要拿先前模擬的資料**X**，丟入`fastICA()`，便可以進行獨立成份分析。
+
+在使用上，參數的設定跟FastICA中的演算法有關，若想深入了解如何設定參數，建議先理解演算法後，再根據 Help Document 來設定。(基本會需要 neg-entropy、kurtosis 等統計知識)
+
+若只是想簡單應用，可以直接使用預設值(default)，並留意來源訊號/資料的數量，以`n.comp`來設定：
+
+```{r}
+# ICA for extracting independent sources from mixed signals
+ICA_result = fastICA(X, n.comp = 2)
+
+# 以下兩個就是ICA萃取出的來源 
+S1_extracted = ICA_result$S[, 1]
+S2_extracted = ICA_result$S[, 2]
+
+# 並做圖畫出來
+par(mfcol = c(1, 2))
+plot(1:1000, S1_extracted, type = "l", xlab = "S'1", ylab = "")
+plot(1:1000, S2_extracted, type = "l", xlab = "S'2", ylab = "")
+
+```
+
+如果將一開始模擬的訊號，跟ICA萃取的訊號做比對，會發現一模一樣：
+
+<center><img src="2.png"></center> 
+
+
+------
+
+### 選擇多少個來源訊號的數量？{#P2-3}
+
+跟主成份分析(PCA)需要決定選多少個主成份(利用「解釋變異」)的概念一樣，一般在使用 ICA 時，也必須知道原始訊號的數量，也就是上面程式的`n.comp`參數。
+
+在實務應用中，一般可以仰賴領域(先驗)知識來決定。例如，你可以確定原始訊號的個數，跟混合訊號一樣。
+
+但如果沒有相關經驗或知識的話，就很難判斷 ICA 中的來源訊號要選幾個。這時候，就得依照某些方法選擇component的數量。
+
+其中，基於information-theoretic criteria (ITC)的資訊理論，是一個不錯且實用的方法：<a href="https://www.ncbi.nlm.nih.gov/pubmed/17274023" target="_blank">Estimating the number of independent components for functional magnetic resonance imaging data</a>
+
+
+
+------
+
+## 3. 總結{#P3}
+
+由於 ICA 可以從混合訊號中分離出原始訊號，因此常被用於醫學跟通訊領域的研究中，從蒐集到的電子訊號中找出來源或起因。
+
+此外 ICA 跟 PCA 一樣，都是常用來降維的手法。若由特徵的角度來看，兩者也都是特徵萃取(feature extraction)的演算法，但思維卻不一樣：
+
+「ICA 是從資料中分離出特徵，PCA 則是從資料中結合出特徵」。
+
+但因為原始訊號(component)的數量難以定論，以及原始訊號得為非高斯(常態)分配的假設，因此相較於 PCA ，ICA 在某些運用上被認為不太實用，往往會面臨到一些困境(當然，還是得根據運用的領域跟目的而定)。
+
+因此，使用前要好好先理解兩者的概念，理解優與劣，再根據問題及目標來應用。
+
+It's still a long way to go~  
+
+------
+
+## 4. Reference{#P4}
+
+* <a href="https://sway.com/8E5AAkpEYq1DdCiH" target="_blank">ICA, LLE</a>
+
+* <a href="http://arnauddelorme.com/ica_for_dummies/" target="_blank">Independent Component Analysis for dummies</a>   
+
+* <a href="https://ithelp.ithome.com.tw/articles/10188526" target="_blank">Dimensional Reduction -- ICA </a>   
+
+* <a href="https://info.babyhome.com.tw/article/1688" target="_blank">雞尾酒會效應</a>   
+
+* <a href="https://www.cs.helsinki.fi/u/ahyvarin/papers/fastica.shtml" target="_blank">FastICA Algorithm</a>   
+
+* <a href="http://rpubs.com/skydome20/93614" target="_blank">R Example for ICA Implement </a>   
+
+* <a href="https://www.ncbi.nlm.nih.gov/pubmed/17274023" target="_blank">Estimating the number of independent components for functional magnetic resonance imaging data</a>
+
+------
+
+## 5. R and packages version{#P5}
+
+這是本篇筆記使用R跟套件版本：
+
+```{r}
+pkgs = c("fastICA")
+r_version = paste("R", getRversion())
+pkg_version = c()
+for (package_name in pkgs) {
+    pkg_version = c(pkg_version, 
+                    paste(package_name,packageVersion(package_name)))
+}
+c(r_version, pkg_version)
+
+```

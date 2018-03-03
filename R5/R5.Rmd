@@ -294,7 +294,7 @@ ncvTest(model)
 由於**虛無假設H0:殘差變異數具有同質性**，因為p-value < 0.05，代表**拒絕H0**。(這表示上面的線性模型無法使用)   
 
 
-##**預測**    
+##**預測**{#P4-4}      
 最後，我們建立模型的目的，是要用來預測！
 
 因此，現在我們手上有一筆新的觀測值，只有Sepal.Width、Petal.Length、Petal.Width的資訊，那我們就可以用建好的迴歸模型，預測出Sepal.Length的值，這時使用`predict()`函式：
@@ -315,10 +315,13 @@ predict(model, new.iris)
 若要用統計上的檢定，要進一步地確認，就可以使用變異數分析(anova)。   
    
 假設檢定的對應H0和H1分別如下：   
-**H0:μ(Setosa)=μ(Versicolor)=μ(Virginica)**   
-**H1:至少有一種平均數和其他品種不相等**   
+
+* H0: μ(Setosa) = μ(Versicolor) = μ(Virginica)
+
+* H1: 至少有一種平均數和其他品種不相等
+
    
-要用one-way-anova，R的函式是`anova()`，並且事先要跑線性回歸模型：
+要用o ne-way-anova ，R的函式是`anova()`，並且事先要跑線性迴歸模型：
 ```{r}
 a.lm <- lm(Petal.Width~Species, data=iris)
 anova(a.lm)
@@ -327,7 +330,7 @@ b.lm <- lm(Petal.Length~Species, data=iris)
 anova(b.lm)
 ```
    
-兩者的p-value都遠小於0.05，表示不同品種間確實有顯著差異。
+兩者的 p-value 都遠小於0.05，表示不同品種間確實有顯著差異。
    
 ------
    

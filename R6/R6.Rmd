@@ -19,33 +19,19 @@ output:
 1. [關聯式規則(Association Rules)](#P1)
     * [apriori()建立關聯規則](#P1-1)
     * [冗規則判斷與去除](#P1-2)
-    * [交集，聯集，否定](#P1-3)
+    * [視覺化](#P1-3)
 2. [決策樹(Decision Tree)](#P2)
     * [rpart()建立決策樹](#P2-1)
     * [視覺化](#P2-2)
     * [預測](#P2-3)
 3. [總結](#P3)
 4. [Reference](#P4)  
+5. [R and packages version](#P5)
+   
 
 ------
    
-#**Version Requirement**   
-   
-這篇筆記是在此版本的狀態撰寫的：
-
-> * R-3.2.5     
-> * `arules` package = 1.4-2   
-   
-(2017-04-24)    
-新增以下版本的撰寫方式：   
-
-> * R-3.4.0
-> * `arules` package = 1.5-2 
-  
-
-------
-   
-#**1. 關聯式規則(Association Rules)**{#P1}   
+# 1. 關聯式規則(Association Rules){#P1}   
    
 這裡拿網路上一個公開資料(鐵達尼號的乘客資料)來進行分析，<a href="http://www.rdatamining.com/data/titanic.raw.rdata?attredirects=0&d=1" target="_blank">資料載點如下</a>。   
 
@@ -92,6 +78,8 @@ str(titanic.raw)
 好啦，就不賣關子了。事實上這件事其實並不難。
 
 其中一個方法，就是本篇即將用到的第一個方法：**關聯式法則(apriori)**！(對應的套件：`arules`)
+
+----
 
 ## apriori()建立關聯規則{#P1-1}
 
@@ -140,6 +128,9 @@ inspect(sort.rule)
 
 看第一個關聯規則：「若身分是成人女性 => 則會存活」，lift=2.3 > 1，表示預測結果比原本表現好。   
 
+----
+
+
 ## 冗規則判斷與去除{#P1-2}
 
 
@@ -169,6 +160,8 @@ subset.matrix <- as.matrix(is.subset(x=sort.rule, y=sort.rule))
 (當你用RStudio打開**subset.matrix**這個變數時，會看見一個8x8的矩陣)
 
 之後再進行以下步驟：
+
+
 ```{r}
 # 把這個矩陣的下三角去除，只留上三角的資訊
 subset.matrix[lower.tri(subset.matrix, diag=T)] <- NA
@@ -182,6 +175,9 @@ sort.rule <- sort.rule[!redundant]
 inspect(sort.rule)
 ```
 經過以上步驟後，多餘的規則消失了！   
+
+
+-----
 
 
 ## 視覺化{#P1-3}
@@ -206,12 +202,15 @@ plot(sort.rule, method="grouped")
    
 ------
    
-#**2. 決策樹(Decision Tree)**{#P2}   
+# 2. 決策樹(Decision Tree){#P2}   
 
 無論在分類或預測上，決策樹的演算法都有很好的效果。   
    
-但它最強大的地方，莫過於樹狀分支的結構：可以明顯呈現分類的規則！與一些機器學習的方法(NN, SVM...)相比，相當容易進行解釋，以及分析規則之間的關係。   
+但它最強大的地方，莫過於樹狀分支的結構：可以明顯呈現分類的規則！與一些機器學習的方法(NN, SVM...)相比，相當容易進行解釋，以及分析規則之間的關係。
+
+
 ## rpart()建立決策樹{#P2-1}
+
 
 這裡就簡單用CART決策樹來練習，對應的套件是`rpart`，一樣使用剛才鐵達尼號的資料：
 ```{r, message=F,warning=F}
@@ -227,6 +226,8 @@ test <- titanic.raw[-train.index, ]
 cart.model<- rpart(Survived ~. , 
                     data=train)
 ```   
+
+----
 
 
 ## 視覺化{#P2-2}
@@ -273,6 +274,9 @@ prp(cart.model,         # 模型
 **(OS：男生好可憐QHQ 這個社會好現實QHQ)**   
 
 
+----
+
+
 ## 預測{#P2-3}
 
  
@@ -293,7 +297,7 @@ sum(diag(confus.matrix))/sum(confus.matrix) # 對角線的數量/總數量
    
 ------
    
-#**總結**{#P3}  
+# 3. 總結{#P3}  
 
 和一些機器學習方法只會專注在「預測準確率」的概念不太一樣，，關聯式法則和決策樹在「解釋」上具有十分強大的優勢。   
 
@@ -309,7 +313,7 @@ It's still a long way to go~
 
 ------
    
-#**Reference**{#P4}  
+# 4. Reference{#P4}  
 
 <a href="http://www.rdatamining.com/examples/association-rules
 " target="_blank">http://www.rdatamining.com/examples/association-rules
@@ -322,4 +326,21 @@ It's still a long way to go~
 
 
 
+------
+
+# 5. R and packages version{#P5}
+
+這是本篇筆記使用R跟套件版本：
+
+```{r}
+pkgs = c("arules", "arulesViz", "rpart.plot", "rpart")
+r_version = paste("R", getRversion())
+pkg_version = c()
+for (package_name in pkgs) {
+    pkg_version = c(pkg_version, 
+                    paste(package_name,packageVersion(package_name)))
+}
+c(r_version, pkg_version)
+
+```
 

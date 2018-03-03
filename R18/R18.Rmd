@@ -1,0 +1,590 @@
+---
+title: "R筆記 -- (18) Subsets & Shrinkage Regression (Stepwise & Lasso)"
+author: "skydome20"
+date: "2018/03/03"
+output: 
+ prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    css: style.css
+---
+
+
+<a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
+
+
+#### Co-authors: <a href="https://rpubs.com/jeff_datascience/DS_Notebook" target="_blank">Jeff Hung</a>
+
+
+------
+
+# 本篇目錄
+
+0. [簡言](#P0)
+1. [Subsets Method](#P1)
+    * [Stepwise 跟 Best Subsets 討論](#P1-1)
+    * [R Code for Stepwise Regression](#P1-2)
+        * [Forward](#P1-2-1)
+        * [Backward](#P1-2-2)
+        * [Both](#P1-2-3)
+        * [預測](#P1-2-4)
+    * [結果討論](#P1-3)
+2. [Shrinkage Method](#P2)
+    * [Lasso 跟 Ridge Regression 討論](#P2-1)
+    * [R Code for Shrinkage Regression](#P2-2)
+        * [係數如何收縮：Ridge 跟 Lasso 的不同](#P2-2-1)
+        * [如何找出最佳lambda？](#P2-2-2)
+        * [Lasso的變數挑選](#P2-2-3)   
+        * [預測](#P2-2-4)
+3. [總結](#P3)
+4. [Reference](#P4)
+5. [R and packages version](#P5)
+
+------
+
+## 0. 簡言{#P0}   
+
+線性迴歸有許多變形(variants)，主要是因為實務上的情況往往不會跟理論假設一樣，因此若單純使用線性迴歸，可能會產生許多問題。
+
+例如，以模型的表現來說，常常都會遇到overfitting的問題，這時候就必須要試圖降低「模型的複雜度」。
+
+又或者，當資料中具有「共線性(collinearity)」的問題時，在估計迴歸係數時就會發生問題，其係數的正負值就不可信。【這裡必須要扯到線性迴歸的估計數學式：簡言之，在估計係數時，會使用到資料的反矩陣，又在計算反矩陣的過程中，會有行列式(Determinant)值的計算，而此行列式值是放在分母的位置。當有共線性的問題時，表示資料間彼此有高相關，所計算的行列式值會趨近於 0。這時，若再把趨於 0 的值放分母，那估出來的係數就容易出錯啦！也就是說，原本參數有不偏統計量的特性(unbiased estimation)，但參數變異數將得很大。而這個問題可以藉由變異數膨脹係數(VIF)檢查，或利用後續參數挑選的方法來解決】
+
+
+
+為了解決上述的建模問題，Subsets 跟 Shrinkage 的方法便孕育而生：
+
+
+| 方法                               |      代表模型                        |
+|:----------------------------------:|:------------------------------------:| 
+| 子集法(subsets selection)           |  Best Subsets, Stepwise Regression | 
+| 收縮法(shrinkage / regularization)  |  Lasso, Ridge                      |
+
+
+其中，由於Stepwise 跟 Lasso 具有迴歸本身統計特性，如今也被廣泛應用於「挑選重要變數」的議題上。(Lasso: least absolute shrinkage and selection operator)
+
+
+
+------
+
+
+## 1. Subsets Regression{#P1}
+
+### Stepwise 跟 Best Subsets 討論{#P1-1}
+
+Stepwise 的中文叫「逐步回歸法」，往往都跟 Best Subsets Regression 一起拿出來討論。
+
+這兩者的核心概念很簡單，都是想說能不能用比較簡單的模型，就能達成跟原模型差不多的表現與效果。
+
+舉個例子，假設現在資料中有 x1 ~ x5 五個變數，那線性迴歸就能寫成：
+
+<center>  `y = a + b1 * x1 + b2 * x2 + b3 * x3 + b4 * x4 + b5 * x5`  </center>
+
+這時候，如果是 Best Subsets 的手法，就會開始列出所有的排列組合：
+
+1. 模型只有一個變數(共5個模型)：
+<center> `y = a + b1 * x1 ` 、 `y = a + b2 * x2` ...以此類推 </center>
+
+2. 模型只有兩個變數(共10個模型)：
+<center> `y = a + b1 * x1 + b2 * x2` 、`y = a + b1 * x1 + b3 * x3` ...以此類推 </center>
+
+3. 模型只有三個變數(共10個模型)
+
+4. 模型只有四個變數(共5個模型)
+
+5. 模型只有五個變數(共1個模型 = 原模型)
+
+此時就會有31個模型，然後根據 AIC 或 BIC指標，選取一個表現最佳的模型！但可以想見的，這樣的做法是會耗費大量的時間， n 個變數就會需要建 2^n -1 個模型，效率上面很不讓人喜愛。
+
+所以 Stepwise Regression 改善了這種情況：只需要建構「一個模型」，然後在上面直接新增(或減少)變數。一般有兩種方法：向前選取法(Forward)跟向後選取法(Backward)：
+
+* Forward Stepwise：在一個空的迴歸中，逐一添加變數，直到任何一個變數的額外貢獻度(AIC值)已經沒有統計意義了，那就停止。(p >> n 可以使用)
+
+* Backward Stepwise：在一個完整的迴歸中，逐一移除變數，直到移除任何一個變數時，模型都會損失過多的解釋力，那就停止。(只有 n > p 才可以使用)
+
+* Both：以上兩種方法的結合， 同時考量新增/移除變數對模型的影響，缺點是運算效率會比較慢。
+
+要注意的是，Forward 在新增變數後就不會再取出，並以現狀為基準，來衡量後續添加變數的貢獻，因此有時候會因為添加順序而產生問題(例如，一開始先選 x1，那接下來就會選 x2；可是如果先選 x2，卻不保證接下來一定會選 x1)。**Backward 跟 Both 也同理。**
+
+有關於Best Subsets 跟 Stepwise Regression 的比較與優劣，可以參考這篇文章，裡面有較完善的討論：
+<a href="http://blog.minitab.com/blog/adventures-in-statistics-2/which-is-better%2C-stepwise-regression-or-best-subsets-regression" target="_blank">Which Is Better, Stepwise Regression or Best Subsets Regression?</a>   
+
+------
+
+### R Code for Stepwise Regression{#P1-2}
+
+在R裡面，要建立 Stepwise Regression，會使用`step()`的函式。(由於已在R的內建package `stats`中，故不用再額外匯入。)
+
+這裡拿套件`lasso2`中的前列腺癌症資料，示範後續的 Forward 和 Backward 的程式碼。(關於資料欄位的詳細描述，可以參考<a href="https://rafalab.github.io/pages/649/prostate.html"target="_blank">官方文件</a>)
+
+要注意的是，依變數會是`lpsa`(**Log Prostate Specific Antigen**)，其中 PSA 叫做「攝護腺特異抗原」，代表血漿內的攝護腺特異抗原濃度，當其上升時，是提示攝護腺癌的敏感監測指標之一(但不能作為確診指標)。而其他的變數則作為自變數。
+
+```{r}
+data(Prostate, package="lasso2")
+str(Prostate)
+
+# 先把資料區分成 train=0.8, test=0.2 
+set.seed(22)
+train.index <- sample(x=1:nrow(Prostate), size=ceiling(0.8*nrow(Prostate) ))
+
+train = Prostate[train.index, ]
+test = Prostate[-train.index, ]
+```
+
+
+------
+
+
+
+#### Forward Stepwise Regression{#P1-2-1}
+使用Forward Stepwise Regression ，步驟有兩個：
+
+1. 先建立一個空的線性迴歸(只有截距項)
+
+2. 用`step()`，一個一個把變數丟進去，看哪個變數貢獻最多！(衡量AIC)
+
+值得注意的是，其中有一個 **scope** 參數，是用來描述模型的完整度(如果不設定，預設是會進行 **backward**)：
+
+```{r}
+# 1.建立空的線性迴歸(只有截距項)
+null = lm(lpsa ~ 1, data = train)  
+full = lm(lpsa ~ ., data = train) # 建立上界，也就是完整的線性迴歸
+
+# 2.使用step()，一個一個把變數丟進去
+forward.lm = step(null, 
+                  # 從空模型開始，一個一個丟變數，
+                  # 最大不會超過完整的線性迴歸
+                  # (一定要加上界 upper=full，不可以不加) 
+                  scope=list(lower=null, upper=full), 
+                  direction="forward")
+```
+
+訓練過程中，我們可以觀察到是怎麼每一次增加變數到模型內的。
+
+這裡是用 AIC 指標(暫不贅述，只要知道它是用來評選模型的指標就好，跟 BIC一樣是**越小越好**) 衡量每個變數的貢獻度。
+
+一開始空的模型，其 AIC = 20.65，如果增加`lcavol`變數，AIC 會變化最多，成為 -36.465。
+
+再來拿 AIC = -36.46 的模型，如果增加`lweight`的話， AIC 會變成 -46.546，改變幅度最大。
+
+以此類推......直到發現如果新增變數時，反而會使 AIC 上升，那就停止。
+
+因此上面訓練過程的結果可以彙整成下表：
+
+
+
+| 原模型                                  | 原AIC  | 增加變數        | 改變後的 AIC | 
+|:---------------------------------------:|:------:| :--------------:|:------------:|
+| lpsa ~ 1                                | 20.65  | lcavol          | -36.465      |
+| lpsa ~ lcavol                           | -36.46 | lweight         | -46.546      | 
+| lpsa ~ lcavol + lweight                 | -46.55 | svi             | -55.353      |
+| lpsa ~ lcavol + lweight + svi           | -55.35 | gleason         | -57.088      |
+| lpsa ~ lcavol + lweight + svi + gleason | -57.09 |                 | -57.088      |
+
+
+```{r}
+summary(forward.lm)
+```
+
+最終的模型如上結果， Adj R-squared = 0.6486。
+
+此外，forward 的概念是用「挑的」，所以保留於模型中的這四個變數，可以說是「被挑出來的重要變數」。
+
+若要進一步進行推論，則得先留意其 p-value，看哪幾個比較顯著(`lcavol + lweight + svi`)，再由係數判斷對攝護腺特異抗原濃度的影響：
+
+
+
+------
+
+
+
+#### Backward Stepwise Regression{#P1-2-2}
+
+同理，使用Backward Stepwise Regression ，步驟也有兩個：
+
+1. 先建立一個完整的線性迴歸
+
+2. 用`step()`，一個一個把變數移除，看移除哪個變數後 AIC 下降最多！
+
+```{r}
+# 1. 先建立一個完整的線性迴歸
+full = lm(lpsa ~ ., data = train)  
+
+# 2. 用`step()`，一個一個把變數移除，看移除哪個變數後 AIC 下降最多！
+backward.lm = step(full, 
+                   # 這裡可以加下界(lower=null)，也可以不加
+                   scope = list(upper=full), 
+                   direction="backward")  
+```
+
+這裡的解析跟 forward 一樣，可以將訓練過程彙整成下表：
+
+| 原模型                                                            | 原AIC  | 移除變數 |改變後的 AIC| 
+|:-----------------------------------------------------------------:|:------:|:--------:|:----------:|
+|lpsa ~ lcavol + lweight + age + lbph + svi + lcp + gleason + pgg45| -52.86 | pgg45    | -54.840    |
+| lpsa ~ lcavol + lweight + age + lbph + svi + lcp + gleason        | -54.84 | lcp      | -56.596    |
+| lpsa ~ lcavol + lweight + age + lbph + svi + gleason              | -56.6  |          | -56.596    |
+
+
+```{r}
+summary(backward.lm)
+```
+
+
+最終的模型如上結果， Adj R-squared = 0.6546。
+
+由於backward 是用「剔除」，所以保留於模型中的這六個變數，可以說是「被留下來的重要變數」。
+
+若要進一步進行推論，一樣得先留意其 p-value，看哪幾個比較顯著(`lcavol + lweight + svi`)，再由係數判斷對攝護腺特異抗原濃度的影響：
+
+
+------
+
+
+#### Both Stepwise Regression{#P1-2-3}
+
+至於 Both，其概念是同時衡量「移除」跟「新增」變數時，哪個行為以及哪個變數影響 AIC 最多。
+
+因此從 null 開始或是從 full 開始都可以，只不過兩者的結果會不一樣(可以思考看看為什麼會這樣)：
+
+```{r, eval=FALSE}
+# 此案例中，剛好跟 forward 結果一樣
+step(null, scope = list(upper=full), direction="both")
+# 此案例中，剛好跟 backward 結果一樣
+step(full, scope = list(upper=full), direction="both")  
+```
+
+
+------
+
+
+#### 預測{#P1-2-4}
+
+在建模過程中，我們已經達成「變數挑選」的目的，看變數的 p-value 以及係數來作推論，而建完模後往往要面對的議題便是預測。
+
+先比較一開始建立的 forward 跟 backward 模型：
+
+
+| 模型                                                 | AIC    | 方法     | 
+|:----------------------------------------------------:|:------:|:--------:|
+| lpsa ~ lcavol + lweight + svi + gleason              | -57.09 | Forward  |
+| lpsa ~ lcavol + lweight + age + lbph + svi + gleason | -56.6  | Backward |
+
+由於`step()`回傳的模型形態跟`lm()`是一樣的，所以直接用線性迴歸(R筆記-(5))的預測方法就可以。
+
+以下會比較三個模型(`full`, `forward`, `backward`)的預測效果：
+
+```{r}
+# self-defined 的 R-squared 函式
+R_squared <- function(actual, predict){
+  mean_of_obs <- rep(mean(actual), length(actual))
+  
+  SS_tot <- sum((actual - mean_of_obs)^2)
+  SS_reg <- sum((predict - mean_of_obs)^2)
+  #SS_res <- sum((actual - predict)^2)
+  R_squared <- SS_reg/SS_tot   #1 - (SS_res/SS_tot)
+  R_squared
+}
+
+
+# 直接用 predict()來預測
+lm.test = predict(full, test)
+forward.test = predict(forward.lm, test)
+backward.test = predict(backward.lm, test)
+
+# 衡量 lm, forward, backward 的預測結果
+c(R_squared(test$lpsa, lm.test),
+  R_squared(test$lpsa, forward.test),
+  R_squared(test$lpsa, backward.test)
+)
+```
+
+可以發現，forward 無論在 train 或 test 的效果比較好。
+
+換句話說，在攝護腺癌的這個案例，使用較多的變數會讓線性模型的效果變差(只有線性，非線性模型則不一定)，反而是保留某些重要變數來建模，更能呈現出資料的線性形態。
+
+
+------
+
+### 結果討論{#P1-3}
+
+以上的範例是先分 Train 跟 Test 來進行，主要是「預測」的考量。若今天是要探討「變數重要性」、或「解釋 X 跟 Y」的關係，還是會傾向將全部資料放進線性迴歸來建模。
+
+
+而關於p-value，統計中 0.05 ~ 0.1稱之為marginal significance，雖然本文是拿 0.05 當作一個基準，不過事實上有某些學者認為這樣的變數還是具有一定的顯著性，因此在變數挑選的過程中，還是要根據實務狀況來訂下一個基準。
+
+當我們比較 forward 跟 backward 的模型時，`lcavol + lweight + svi `這三個變數，基本上可以說是真正「統計上的重要變數」。(之所以不把`gleason`納入考量，是因為其 p-value 並不顯著。)
+
+然而，即使`gleason`並不顯著，又或是 backward 比 forward 多增加 `age + lbph` 這兩個變數，也無法降低 AIC、無法使預測效果變好，那是否就可以說，**這幾個變數不重要呢？**
+
+**答案是不一定。**
+
+需知道，在判斷「重要變數」時，往往也得跟實務上的「領域知識」做結合。
+
+使用 Stepwise Regression 挑選出來的重要變數，其實只是在「統計上」具有意義，並不代表「實際上」是有意義的，只能說有這個可能性而已。
+
+所謂的資料，其實都只是「樣本」，並非「母體」。
+
+因此，當今天判斷出某個變數並不顯著(重要)時，有可能只是因為我們所蒐集的資料不足，所以無法在統計上顯現出這些變數的重要性。
+
+又或者，資料本身並不適合用線性模型來模擬，反而用非線性的模型比較好(e.g., 決策樹、SVM)。
+
+有很多因素都會影響最後資料分析提供的結果，因此需要多方比較，並佐以實務面上的知識，才能做出最後定論。
+
+
+------
+
+## 2. Shrinkage Method{#P2}
+
+### Lasso 跟 Ridge Regression 討論{#P2-1}
+
+另一種迴歸的變形是引入正則化 regularization (i.e., shrinkage)的技巧，將迴歸的權重和給予限制，藉此「限制模型的複雜度」，解決 overfitting的問題。其數學公式跟幾何意義可以用下圖表示：
+
+<center><img src="1.png"></center>
+
+以最佳化的概念來看：
+
+* L1 term 代表權重的絕對值和給限制，故會形成菱形的可行解域，也就是 Lasso。
+
+* L2 term 代表權重的平方和給限制，故會形成圓形的可行解域，也就是 Ridge。
+
+其中，因為 L1 term 可行解域的關係，使得訓練過程中會使變數產生稀疏性(Sparsity)，故常被用來進行變數挑選。此外，由於稀疏性的議題在大數據(Big Data)中相當重要，牽扯到運算效率跟記憶體的使用，因此許多科技大廠紛紛提出以此為基準的模型，結合梯度下降法(SGD)，應用於他們的廣告實務上(i.e., Online Machine Learning Algorithms)：
+
+* <a href="http://www.jmlr.org/papers/volume10/duchi09a/duchi09a.pdf" target="_blank">FOBOS (2009, Google) </a> 
+
+* <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/xiao10JMLR.pdf" target="_blank">RDA (2010, Microsoft)  </a> 
+
+* <a href="https://static.googleusercontent.com/media/research.google.com/zh-TW//pubs/archive/37013.pdf" target="_blank">FTRL-Proximal (2011, Google) </a> 
+
+
+此外，由於 L1 跟 L2 term 是對權重給予限制，因此此手法並不只侷限於線性迴歸，在類神經網路(i.e.,深度學習)的建模，也時常將此概念(regularization)引入，避免 overfitting。
+
+在此不詳述詳細的 Lasso 跟 Ridge 的數學意義，若有興趣可以閱讀這本DS聖經 <a href="https://web.stanford.edu/~hastie/Papers/ESLII.pdf" target="_blank">The Elements of Statistical Learning</a>。這裡只簡單整理兩者的優缺點：
+
+<center><img src="2.png"></center>
+
+
+------
+
+
+## R Code for Shrinkage Regression{#P2-2}
+
+
+要建 Lasso 跟 Ridge Regression 的模型，會需要用到`glment`這個套件：
+
+```{r, message=FALSE}
+require(glmnet)
+```
+
+跟 Stepwise 一樣，這裡拿套件`lasso2`中的前列腺癌症資料，示範後續的 Forward 和 Backward 的程式碼。(關於資料欄位的詳細描述，可以參考<a href="https://rafalab.github.io/pages/649/prostate.html"target="_blank">官方文件</a>)
+
+要注意的是，依變數會是`lpsa`(**Log Prostate Specific Antigen**)，其中 PSA 叫做「攝護腺特異抗原」，代表血漿內的攝護腺特異抗原濃度，當其上升時，是提示攝護腺癌的敏感監測指標之一(但不能作為確診指標)。而其他的變數則作為自變數。
+
+```{r}
+data(Prostate, package="lasso2")
+str(Prostate)
+
+# 把資料區分成 train=0.8, test=0.2 
+set.seed(22)
+train.index = sample(x=1:nrow(Prostate),
+                     size=ceiling(0.8*nrow(Prostate)))
+
+train = Prostate[train.index, ]
+test = Prostate[-train.index, ]
+```
+
+這裡三個參數在建模時需要注意：
+
+```{r, eval=FALSE}
+glmnet(...
+       family = y是連續值，設"gaussian"；若y是二元分類，設"binomial"；若y是多元分類，設"multinomial"。
+       alpha = 0(Ridge) 或 1(Lasso)。
+       lambda = 懲罰值，也就是給權重和的限制 (跟 SVM 中的 C 概念很像)
+       )
+
+```
+
+其中的 lambda ，也就是當把 L1, L2 term 的限制式，用 Largange Multipler 放到優化的目標式時，跟隨限制式的一個常數，學術上叫懲罰值(penalty)。
+
+
+-----
+
+
+
+### 係數如何收縮：Ridge 跟 Lasso 的不同{#P2-2-1}
+
+由於 L1 跟 L2形成的可行解域並不同，因此在收縮變數上面， Ridge 跟 Lasso的表現也不一樣。
+
+我們可以用 R 做圖，X 軸為 lambda(懲罰值) ， Y 軸為各變數的係數值。
+
+可以觀察到，隨著 lambda(懲罰值)增加時， Lasso 的變數係數會陸續變為 0；但 Ridge 卻不一樣，直到某個瞬間才會全部一起變成 0。
+
+正因為這樣的特性， 只要選取一個恰當的 lambda，便可以在 Lasso 上找出係數尚未為 0 的變數，以此來進行變數挑選。
+
+
+```{r, cache}
+ridge = glmnet(x = as.matrix(train[, -9]), 
+               y = train[, 9], 
+               alpha = 0,
+               family = "gaussian")
+
+lasso = glmnet(x = as.matrix(train[, -9]), 
+               y = train[, 9], 
+               alpha = 1,
+               family = "gaussian")
+
+par(mfcol = c(1, 2))
+plot(lasso, xvar='lambda', main="Lasso")
+plot(ridge, xvar='lambda', main="Ridge")
+
+```
+
+-----
+
+
+### 如何找出最佳lambda？{#P2-2-2}
+
+因此，在使用 Ridge 跟 Lasso 時，會有一個參數需要去調，那就是 lambda(懲罰值)。
+
+不同的 lambda 會產生不同的收縮效果，所以我們可以利用 Cross Validation 的手法，驗證在不同 lambda 值下模型的表現如何，然後取殘差最小的(表現最好)模型，其所對應的 lambda 算是比較好的值
+
+在這裡，使用的函式是`cv.glmnet()`，以 lasso 為例，並在下一節進一步探討 lasso 的變數挑選：
+
+```{r}
+
+# 經由 cv 的手法，評估每個模型在不同 lambda 下 
+# 的 cvm(mean cross-validated error)
+cv.lasso = cv.glmnet(x = as.matrix(train[, -9]), 
+                     y = train[, 9], 
+                     alpha = 1,  # lasso
+                     family = "gaussian")
+
+# 評估每個模型的 cvm(mean cross-validated error)後
+# 取最小 cvm 模型所對應的 lambda
+best.lambda = cv.lasso$lambda.min
+best.lambda
+# 藍色垂直虛線就是最佳 lambda 的所在位置，
+# 跟其他線相交的位置就是該變數收縮後的係數
+plot(lasso, xvar='lambda', main="Lasso")
+abline(v=log(best.lambda), col="blue", lty=5.5 )
+
+```
+
+-----
+
+
+### Lasso 的變數挑選{#P2-2-3}
+
+
+變數挑選的話，就要觀察在最佳 lambda 下，哪些變數的係數不為0：
+
+```{r}
+# 觀察哪些變數被挑選出來，其係數不為 0的那些
+coef(cv.lasso, s = "lambda.min")
+
+# 如果要取出這些重要變數的名稱，可以這樣寫：
+select.ind = which(coef(cv.lasso, s = "lambda.min") != 0)
+select.ind = select.ind[-1]-1 # remove `Intercept` and 平移剩下的ind
+select.ind # 第幾個變數是重要的 (不看 `Intercept`)
+
+# 挑出重要變數的名稱
+select.varialbes = colnames(train)[select.ind]
+select.varialbes
+
+# 若要進行推論的話，得挑選出的變數重新做一次線性迴歸
+# 因為 Lasso 中的係數值已經經過收縮，不能直接拿來推論
+# (請將下面各項變數的係數，跟前面 Lasso的係數比較)
+lm(lpsa ~ ., train[, c(select.varialbes, "lpsa")])
+```
+
+### 預測{#P2-2-4}
+
+預測的步驟可以分成三步：
+
+1. 先用`glmnet()`建立基本的 Ridge / Lasso 模型
+
+2. 用`cv.glmnet()`找出最佳的懲罰值 best.lambda
+
+3. 使用`predict()`進行預測
+
+以下用 Ridge 為例：(若要用 Lasso ，只要設定`alpha = 1`就好)
+
+```{r}
+# 1. 先用 glmnet() 建立基本的 Ridge / Lasso 模型
+ridge = glmnet(x = as.matrix(train[, -9]), 
+               y = train[, 9], 
+               alpha = 0, # ridge
+               family = "gaussian")
+
+# 2. 用 cv.glmnet() 找出最佳的懲罰值 best.lambda
+cv.ridge = cv.glmnet(x = as.matrix(train[, -9]), 
+                     y = train[, 9], 
+                     alpha = 0,  # ridge
+                     family = "gaussian")
+best.ridge.lambda = cv.ridge$lambda.min
+
+# 3. 使用 predict()進行預測
+ridge.test = predict(ridge, 
+                     s = best.ridge.lambda, 
+                     newx = as.matrix(test[, -9]))
+
+# 評估模型
+R_squared(test$lpsa, ridge.test)
+```
+
+
+
+------
+
+## 3. 總結{#P3}
+
+線性模型中， Stepwise 跟 Lasso 是常被用來進行變數挑選的模型，其概念主要是為了避免 overfitting，因此以減少變數的方式來降低模型的複雜度。
+
+不過兩者使用的技巧並不一樣：
+
+* Stepwise 是使用子集法(Subsets)，將各種變數進行放入或移除，看模型的表現幅度怎麼樣。
+
+* Lasso(跟 Ridge)則是用最佳化的手法，對係數權重之和下限制，使得各變數隨著 lambda(懲罰值)上升時，其係數會有所收縮(shrinkage)。
+
+另一方面，非線性的模型也能用來進行變數挑選(e.g., RF, Decision Tree, GBM)。
+
+由於非線性模型在訓練過程中，背後並沒有統計假設，只是單純優化損失函數而已，因此這時所挑出來的變數，雖然一樣是對損失函數(Loss Function)有貢獻的，可是卻不能說有統計上的意義，此點跟線性模型的變數挑選不太一樣。
+
+It's still a long way to go~ 
+
+
+------
+
+## 4. Reference{#P4}
+
+本篇筆記的概念全來自這本書：<a href="https://web.stanford.edu/~hastie/Papers/ESLII.pdf" target="_blank">The Elements of Statistical Learning</a> 
+
+* <a href="https://zh.wikipedia.org/wiki/%E5%89%8D%E5%88%97%E8%85%BA%E7%89%B9%E5%BC%82%E6%8A%97%E5%8E%9F" target="_blank">攝護腺特異抗 </a>  
+
+* <a href="http://blog.minitab.com/blog/adventures-in-statistics-2/which-is-better%2C-stepwise-regression-or-best-subsets-regression" target="_blank">Which Is Better, Stepwise Regression or Best Subsets Regression?</a>   
+
+* <a href="http://cpmarkchang.logdown.com/posts/193261-machine-learning-overfitting-and-regularization" target="_blank">機器學習 -- Overfitting and Regularization</a>  
+
+* <a href="http://www.jmlr.org/papers/volume10/duchi09a/duchi09a.pdf" target="_blank">FOBOS (2009, Google) </a> 
+
+* <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/xiao10JMLR.pdf" target="_blank">RDA (2010, Microsoft)  </a> 
+
+* <a href="https://static.googleusercontent.com/media/research.google.com/zh-TW//pubs/archive/37013.pdf" target="_blank">FTRL-Proximal (2011, Google) </a> 
+
+------
+
+## 5. R and packages version{#P5}
+
+這是本篇筆記使用R跟套件版本：
+
+```{r}
+pkgs = c("stats", "lasso2", "glmnet")
+r_version = paste("R", getRversion())
+pkg_version = c()
+for (package_name in pkgs) {
+    pkg_version = c(pkg_version, 
+                    paste(package_name,packageVersion(package_name)))
+}
+c(r_version, pkg_version)
+
+```
