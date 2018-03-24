@@ -92,7 +92,7 @@ summary(iris)
    
 嗯...好像看不出什麼東西？   
    
-那試試看花瓣長度(Sepal.Length)和花瓣寬度(Sepal.Width)：
+那試試看花瓣長度(Petal.Length)和花瓣寬度(Petal.Width)：
 
 ```{r, message=F}
 #*** 附上三種繪圖系統的程式碼，以ggplot2輸出 ***#
