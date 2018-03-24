@@ -28,7 +28,7 @@ output:
 3. [Stacking](#P3)
     * [R Code for Stacking Implement](#P3-1)
         * [第一階段(Stacking)](#P3-1-1)
-        * [第二階段(Meta-Model)](#P3-1-2)
+        * [第二階段(Blending)](#P3-1-2)
 4. [總結](#P4)
 5. [Reference](#P5)
 6. [R and packages version](#P6)   
@@ -54,9 +54,10 @@ output:
 
 * Boosting
 
-* Stacking (i.e., meta ensembling; 上述兩個案例都是使用 Stacking 的技巧)
+* Stacking (short for *<a href="http://machine-learning.martinsewell.com/ensembles/stacking/Wolpert1992.pdf" target="_blank">stacked generalization</a>*, also called *meta ensembling*)
 
-只不過這三種架構，在結合模型時使用的概念並不一樣，因此本文中會依序介紹這三種方法的概念與實踐方式(用 R)，並示範基於此概念而衍生出來的模型程式如何撰寫： Random Forest(隨機森林) 跟 Gradient Boosting Machine(梯度推進器)
+這三種架構在結合模型時使用的概念並不一樣，因此本文中會依序介紹這三種方法的概念與實踐方式(用 R)，並示範基於此概念而衍生出來的模型程式如何撰寫： Random Forest(隨機森林) 跟 Gradient Boosting Machine (梯度推進器)
+
 
 
 ------
@@ -64,7 +65,7 @@ output:
 
 ### 資料{#P0-1}   
 
-以下會拿套件`lasso2`中的前列腺癌症資料用來建模。(關於資料欄位的詳細描述，可以參考<a href="https://rafalab.github.io/pages/649/prostate.html"target="_blank">官方文件</a>)
+接下來，本文中的所有程式範例，都會拿套件`lasso2`中的前列腺癌症資料用來建模。(關於資料欄位的詳細描述，可以參考<a href="https://rafalab.github.io/pages/649/prostate.html"target="_blank">官方文件</a>)
 
 要注意的是，依變數會是`lpsa`(**Log Prostate Specific Antigen**)，其中 PSA 叫做「攝護腺特異抗原」，代表血漿內的攝護腺特異抗原濃度，當其上升時，是提示攝護腺癌的敏感監測指標之一(但不能作為確診指標)。而其他的變數則作為自變數。
 
@@ -101,6 +102,8 @@ Bootstrap aggregating (Bagging)，從字面上來看，就是將資料裝成一�
 -----
 
 ### R Code for Bagging Implement{#P1-1}   
+
+(範例資料請參考[資料](#P0-1)。)
 
 Bagging 的一開始，是要先把資料做重複抽樣，因此先將 Train 分成三個子資料集(n=33)：
 
@@ -171,7 +174,7 @@ c(mean((y1 - test$lpsa)^2),   # linear regression of subset_1
 
 事實上，在面對資料中有共線性(collinearity)跟類別不平衡(Class Imbalance Problem)，而這些問題會對預測結果造成不良影響時(若是探討對「變數解釋性」的影響，則需要用 Lasso 或 Stepwise 來解決)，隨機森林是倍受青睞的演算法。其概念應該不難理解：「對 Row 抽樣時，可以部份解決類別不平衡來影響預測的問題；對 Column 抽樣時，可以部份解決共線性來影響預測的問題」
 
-而在 R 裡面，`randomForest`套件可以幫我們建立隨機森林的模型：
+而在 R 裡面，`randomForest`套件可以幫我們建立隨機森林的模型(範例資料請參考[資料](#P0-1)。) ：
 
 ```{r, message=FALSE, warning=FALSE}
 require(randomForest)
@@ -287,6 +290,7 @@ varImpPlot(rf_model)
 
 4. 用`xgb.train()`建立模型
 
+(範例資料請參考[資料](#P0-1)。)
 
 ```{r, warning=FALSE, message=FALSE}
 # 1. 將資料格式(Data.frame)，用`xgb.DMatrix()`轉換為 xgboost 的稀疏矩
@@ -411,40 +415,57 @@ mean((xgb_y - test$lpsa)^2) # MSE
 ## 3. Stacking{#P3}
 
 
-關於 Stacking 的概念，不知道為什麼比較冷門，相較於另外兩個架構在網路上的資源也較少。但有趣的是，近年來獲得冠軍的隊伍，反而都是用 Stacking 的技巧。
+最後要討論的 emsemble 技巧是 stacking，其概念很簡單：「在訓練多個模型、得到多個預測值/分類結果後，與其使用投票法(hard voting)或平均法(average)將這些結果整合(ensemble)起來，為何不多訓練一個模型來做這樣的整合呢？」
 
-其演算法粗略概念如下圖，會有兩個階段：
+下圖展現了 stacking 的核心概念：「今天已經訓練好三個機器學習的模型，分別是 linear regression, support vector regression 跟 CART decision tree。當有一筆新資料需要預測時，會各自得到三個預測值(y1, y2, y3)，然後接下來作為最終模型(又稱 meta-model, blender, meta learner)的輸入值，得到最終預測結果(y.final)」
 
-1. 用 Train 資料訓練多個模型，並且得出預測值(yn)，此時稱作 meta-data，作為第二階段的輸入
+<center><img src="3.png"></img></center>
 
-2. 拿 meta-data 進一步訓練一個 meta-model，得到最後的預測值。
+這跟傳統上的做法不太一樣，我們本來可能會把(y1, y2, y3)的結果直接拿來平均(預測問題)或投票法(分類問題)，得到最後的結果；而 stacking 是用另一個模型(blender)來取代這樣的概念，換句話說，就是「把本來的預測結果再進一步做預測」。
 
-<img src="3.png"></img>
+因此，Stacking 的演算法可以分成兩個階段：
 
-簡言之，第一階段其實就是我們平常在訓練模型的步驟，只不過這時預測出來的值會再度重新當作自變數，然後在第二階段進行訓練及預測。
+1. Stacking：先訓練多個初始模型，而這些模型的預測結果叫做  meta-data，會作為最終模型的的輸入。
 
-但上面這樣的描述其實很不詳細，得進一步看細節的訓練狀況，才知道 Stacking 的核心概念。下圖以 Model-1 為例，示範訓練過程及如何產出 meta-data ：
+2. Blending：最終模型會取得 meta-data ，然後整合出最後結果。
 
-<img src="4.png"></img>
+以上的概念應該不難理解，不過如果你打算開始使用 stacking 的技巧來建模，想必會立刻遇到瓶頸：「咦？那我要怎麼訓練初始模型跟最終模型？並得到所謂的 meta-data？」
+
+如果是訓練初始模型，想必大家都會，因為原始資料直接丟下去訓練就可以；可是你有察覺到一個問題嗎：那要怎麼訓練第二階段的最終模型 (meta-model)呢？感覺上也需要有一筆訓練資料存在才能訓練(這樣的資料其實就是 meta-x)，會從初始模型那邊來的感覺...可是實際上是怎麼來的呢？
+
+因此整個概念會比較複雜一點，讓我們慢慢來，先看初始模型的訓練跟取得 meta-data 吧！
+
+基本上，在訓練初始模型取得 meta-data 時，會搭配類似 k-folds 的技巧，將訓練資料切割成數個子集資料(subsets)。
+
+還記得上一張圖我們有三個模型嗎？這裡舉第一個模型(Linear Regression 線性迴歸)為例，假設將訓練資料(Train Data)分成三個子集資料(i.e., 3-folds)(當然不一定要三個，依情況而定。)
+
+因此，從訓練資料(Train Data)中分割而出資料子集，綠色部分會用來訓練模型，紅色部分會拿來預測並取得 Predict_X；由圖中可以得知，概念就是把本來的(Train Data)，經由預測後，全轉換成 Predict_X 的狀態，這時又被稱作 Meta-X，會當成最終模型(Meta-Model)的訓練資料。
+
+另外，我們手中還有原始的測試資料(Test Data)，丟入模型預測後會得到 Predict (紫色部分)；但由於我們一開始把資料分成三份，所以會有三個模型，也會得到三組測試資料的預測結果，這時就會用平均法(連續問題)/投票法(分類問題)，將這三組預測結果整合起來，變成 Predict_Y 的狀態，這時又被稱作 Meta-Y，然後丟給最終模型(Meta-Model)來預測：
 
 
-在訓練過程中，會先將 Train 再分成學習(綠色)跟預測(紅色)的資料集(其實就是把 Train 再分成 Train 跟 Validation 的概念(n-folds)，只是後者預測後的值會作為 Meta-X)。
+<center><img src="4.png"></img></center>
 
-至於 Test，則是會看 Train 分成多少 n-folds，就會有 n 次的預測值，然後再平均後當作 Meta-Y。如下圖所示：
+因此，當今天有多個模型時，其實需要取得各自的 Meta-X 跟 Meta-Y，當作最終模型(Meta-Model)的訓練及測試資料集(如下圖)：
 
-<img src="5.png"></img>
+<center><img src="5.png"></img></center>
 
 
-以上只是單一個模型內部的訓練過程，會產出一組 Meta-Data；如果今天有 4 個模型 (Model-1 ~ Model-4)，那最後就會產出 4 組 Meta-Data，然後丟給第二階段的 Meta-Model 來訓練跟預測(甚至有時候會發展到第三、第四階段，實際的應用已經在[簡言](#P0)中提及了。)
+以上就是 Stacking 的概念了。當然，上面示範兩階段的狀況而已。實際上在 Kaggle 比賽中，很常看見發展成三、四階段的 Stacking 模型。
 
-以上，就是 Stacking 的概念，下一小節會用 R 實踐 Stacking 的概念：
+例如，在[簡言](#P0)中提及的得獎隊伍，就是使用多層階段的 Stacking 模型(同時搭配 Feature Engineering 的技巧)。
+
+下一小節，會用 R 實踐 Stacking 的概念，使用的模型會跟上面的圖例和流程一樣，可以程式碼及概念相互比對學習。
 
 -----
 
 ### R Code for Stacking Implementg{#P3-1}
 
 #### 第一階段(Stacking){#P3-1-1}
-一開始，先把 Train 分成 n-folds (n=3)：
+
+(範例資料請參考[資料](#P0-1)。)
+
+一開始，我們把訓練資料 Train 分成三份(3-folds)：
 
 ```{r}
 # 3-folds
@@ -636,7 +657,7 @@ meta.test.3 = data.frame(`mete.y` = mean.meta.y,
 -----
 
 
-#### 第二階段(Meta-Model){#P3-1-2}
+#### 第二階段(Blending){#P3-1-2}
 
 
 所以現在我們手中有三組 Meta-Train 跟 三組 Meta-Test：
@@ -644,10 +665,10 @@ meta.test.3 = data.frame(`mete.y` = mean.meta.y,
 c(dim(meta.train.1), dim(meta.test.1))
 ```
 
-所以現在要建構第二階段的 Meta-Data，我這裡拿`xgboost`的模型來做：
+所以現在要建構第二階段的 Meta-Model，我這裡拿`xgboost`的模型來做：
 
 ```{r}
-### Meta- Model Constraction 
+### Meta- Model Construction 
 
 # 先把三個 Meta-Train合併一起：
 big.meta.train = rbind(meta.train.1, meta.train.2, meta.train.3)
@@ -682,11 +703,13 @@ mean((final_y - test$lpsa)^2) # MSE
 
 關於 Ensemble Learning，其實牽扯的層面相當廣泛，實在很難在短短一篇文章中，便將所有細節及該考量的議題書寫出來，因此只能在本文中提及我認為較重要的地方。
 
-若真的想要好好了解這個技巧，並且知道背後的數學公式以幾何含意，歡迎聆聽<a href="https://www.youtube.com/watch?v=tH9FH1DH5n0" target="_blank">台大李宏毅老師的教學影片(Ensemble)</a> ，講解得非常完整，相當值得好好花一個半小時來學習；或是閱讀南京大学周志华老师的文章* <a href="http://www2.islab.ntua.gr/attachments/article/86/Ensemble%20methods%20-%20Zhou.pdf" target="_blank">Ensemble methods: foundations and algorithms</a>，裡面對各種 Ensemble Models 有很好的詳解，以及優缺點討論。
+若真的想要好好了解這個技巧，並且知道背後的數學公式以幾何含意，歡迎聆聽<a href="https://www.youtube.com/watch?v=tH9FH1DH5n0" target="_blank">台大李宏毅老師的教學影片(Ensemble)</a> ，講解得非常完整，相當值得好好花一個半小時來學習；
 
-Ensemble Learning 雖然在預測上的效果很好，是傳統模型無法比擬的。不過當大家都追求「高預測表現」時，或許有時候慢下來是另外一種選擇。
+或是閱讀南京大学周志华老师的文章 <a href="http://www2.islab.ntua.gr/attachments/article/86/Ensemble%20methods%20-%20Zhou.pdf" target="_blank">Ensemble methods: foundations and algorithms</a>，裡面對各種 Ensemble Models 有很好的詳解，以及優缺點討論。 
 
-試著重新回到最基本的模型(線性迴歸、決策樹)，並探討資料中變數的深層涵義，思考資料跟現實中如何互相影響、對應，並做出未來的決策方向......或許，這樣才能真正解決存在於現實中的問題(痛點)
+另外，這本 <a href="http://www.deeplearningitalia.com/wp-content/uploads/2017/12/Dropbox_Hands-On-Machine-Learning-with-Scikit-Learn-and-Tensorflow-Aurelien-Geron.pdf" target="_blank">Hands-OnMachine Learningwith Scikit-Learn& TensorFlow</a> (p.181 ~ p.202) 也提供了很完整的介紹跟 python 程式碼。
+
+Ensemble Learning 雖然在預測上的效果很好，是傳統模型無法比擬的。不過當大家都追求「高預測表現」時，或許有時候需要慢下來，試著重新回到最基本的模型(線性迴歸、決策樹)，並探討資料中變數的深層涵義，思考資料跟現實中如何互相影響、對應，並做出未來的決策方向......或許，這樣才能真正解決存在於現實中的問題(痛點)。
 
 It's still a long way to go~  
 
@@ -714,6 +737,12 @@ It's still a long way to go~
 * <a href="https://stats.stackexchange.com/questions/23388/in-boosting-why-are-the-learners-weak" target="_blank">In boosting, why are the learners “weak”?</a>
 
 * <a href="http://www2.islab.ntua.gr/attachments/article/86/Ensemble%20methods%20-%20Zhou.pdf" target="_blank">南京大学周志华老师的Ensemble methods: foundations and algorithms</a>
+
+* <a href="https://op46.com/#/technology/c4254b176ae80ebb0a6124c8cbd5de0c.html" target="_blank">Kaggle機器學習之模型融合（stacking）心得</a>
+
+* https://www.youtube.com/watch?v=LgLcfZjNF44&feature=youtu.be&t=15m7s
+
+* <a href="http://www.deeplearningitalia.com/wp-content/uploads/2017/12/Dropbox_Hands-On-Machine-Learning-with-Scikit-Learn-and-Tensorflow-Aurelien-Geron.pdf" target="_blank">Hands-OnMachine Learningwith Scikit-Learn& TensorFlow</a>
 
 
 ------

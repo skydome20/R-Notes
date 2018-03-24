@@ -12,6 +12,10 @@ output:
 
 <a href="https://rpubs.com/skydome20/Table" target="_blank">返回主目錄</a>   
 
+#### Co-authors: <a href="https://rpubs.com/jeff_datascience/DS_Notebook" target="_blank">Jeff Hung</a>
+
+
+
 ------
 
 # 本篇目錄
@@ -90,9 +94,9 @@ require(arules) # apriori關聯式法則的套件
 
 還記得apriori演算法是怎麼運作的嗎？我們需要設定：
 
-* 最小支持度(min support)：「規則」在資料內具有普遍性   
+* 支持度(min support)：「規則」在資料內具有普遍性，也就是這些 A 跟 B 同時出現的機率多少。   
 
-* 最小信賴度(min confidence)：「規則」要有一定的信心水準   
+* 信賴度(min confidence)：「規則」要有一定的信心水準，也就是當購買 A 狀態下，也會購買 B 的條件機率。    
 
    
 (以上忘記的話，趕緊去讀熟XD)     
@@ -120,13 +124,14 @@ rule <- apriori(titanic.raw,
 inspect(rule)
 ```
    
-根據lift，由大到小排序rule：   
+這時候，看你是想根據 support 大小，或是 lift 大小排序 rules ：   
 ```{r}
+# 以下舉 lift 為例
 sort.rule <- sort(rule, by="lift")
 inspect(sort.rule)
 ```
 
-看第一個關聯規則：「若身分是成人女性 => 則會存活」，lift=2.3 > 1，表示預測結果比原本表現好。   
+看第一個關聯規則：「若身分是成人女性 => 則會存活」，lift=2.3 > 1，表示這個規則相當具有正相關；但其 support 卻沒有想像中的高，這也可以理解，因為當時那個年代，船上的女性人數應該遠低於男性人數，因此女性的樣本數較少，造成 support 較低也是合理的。   
 
 ----
 
@@ -145,6 +150,9 @@ inspect(sort.rule)
 首先，先看某項規則是否為其他規則的子集(subset)：(註，因套件版本的問題，函式回傳的矩陣有所改變，因此下面提供兩種不同的寫法，請依據自己的套件版本來撰寫)   
 
 ```{r}
+# 先根據 support 大小排序 rules
+sort.rule <- sort(rule, by="support")
+
 # 'arules' version = 1.4-2 , under R-3.2.5
 subset.matrix <- is.subset(x=sort.rule, y=sort.rule)
 
@@ -191,11 +199,11 @@ plot(sort.rule)
 
 而且也可以將規則視覺化，知道當初災難發生以後，在什麼樣的條件下比較容易存活/死亡：
 ```{r}
-plot(sort.rule, method="graph", control=list(type="items"))
+plot(sort.rule, method="graph")
 plot(sort.rule, method="grouped")
 ```
 
-現在對照一開始的假設：**「女性比較容易存活」、「男性船員幾乎死光光」**...嗯嗯嗯(點頭)！   
+現在對照一開始的假設：**「女性比較容易存活」、「男性船員幾乎死光光」、「3rd 客艙的成人幾乎無法存活」**...嗯嗯嗯(點頭)！   
 
 不同的是，現在你的手上已經有證據了！因此下次跟別人一起看鐵達尼號時，就大方地拿來說嘴吧！   
 
