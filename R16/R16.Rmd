@@ -449,7 +449,10 @@ mean((xgb_y - test$lpsa)^2) # MSE
 
 基本上，在訓練初始模型取得 Meta-Data 時，會搭配類似 K-folds 的技巧，將訓練資料切割成數個子集資料(Subsets)。
 
-在上一張圖中我們有三個模型，這裡舉第一個模型(Linear Regression 線性迴歸)為例。
+在上一張圖中我們有三個模型，這裡舉第一個模型(Linear Regression 線性迴歸)為例，如下圖(<a href="https://github.com/skydome20/R-Notes/blob/master/R16/4.png" target="_blank">大圖下載</a>)：
+
+<center><img src="4.png"></img></center>
+
 
 假設將訓練資料(Train Data)分成三個子集資料(3-folds)，當然不一定要三個，依情況而定。
 
@@ -461,11 +464,6 @@ mean((xgb_y - test$lpsa)^2) # MSE
 
 但由於我們一開始把資料分成三份，所以會有三個模型，也會得到三組測試資料的預測結果，這時就直接用平均法(連續問題)/投票法(分類問題)，將這三組預測結果整合起來，變成 Predict_Y 的狀態，又被稱作 Meta-Y，並丟給最終模型(Meta-Model)來預測。
 
-
-<center><img src="4.png"></img></center>
-
-
-以上就是訓練模型時需要注意的細節。
 
 換句話說，當擁有多個模型時，我們必須各自取得每個模型的 Meta-X 跟 Meta-Y，來作為最終模型(Meta-Model)的訓練及測試資料集。
 
