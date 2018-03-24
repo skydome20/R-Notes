@@ -10,7 +10,7 @@
 ----------
     
 【LinkedIn】 <a href="https://tw.linkedin.com/in/skydome20" target="_blank">https://tw.linkedin.com/in/skydome20</a>    
-【R筆記】 <a href="http://rpubs.com/skydome20/Table" target="_blank">http://rpubs.com/skydome20/Table</a>    
+【R 筆記】 <a href="http://rpubs.com/skydome20/Table" target="_blank">http://rpubs.com/skydome20/Table</a>    
 【POLab】 <a href="https://github.com/PO-LAB/Data-Mining" target="_blank">https://github.com/PO-LAB/Data-Mining</a>   
 
 ----------
@@ -45,9 +45,9 @@
 * <a href="https://skydome20.github.io/R-Notes/R8/R8" target="_blank">R筆記 -- (8) 類神經網路(neuralnet)</a>   
 * <a href="https://skydome20.github.io/R-Notes/R9/R9" target="_blank">R筆記 -- (9) 分群分析(Clustering)</a>   
 * <a href="https://skydome20.github.io/R-Notes/R14/R14" target="_blank">R筆記 -- (14) Support Vector Machine/Regression(支持向量機SVM)</a>  
-* <a href="http://rpubs.com/skydome20/R-Note16-Ensemble_Learning" target="_blank">R筆記 -- (16) Ensemble Learning(集成學習)</a> 
-* <a href="http://rpubs.com/skydome20/R-Note17-ICA" target="_blank">R筆記 -- (17) 獨立成份分析(ICA)</a> 
-* <a href="http://rpubs.com/skydome20/R-Note18-Subsets_Shrinkage_Methods" target="_blank">R筆記 -- (18) Subsets & Shrinkage Regression (Stepwise & Lasso)</a> 
+* <a href="https://skydome20.github.io/R-Notes/R16/R16" target="_blank">R筆記 -- (16) Ensemble Learning(集成學習)</a> 
+* <a href="https://skydome20.github.io/R-Notes/R17/R17" target="_blank">R筆記 -- (17) 獨立成份分析(ICA)</a> 
+* <a href="https://skydome20.github.io/R-Notes/R18/R18" target="_blank">R筆記 -- (18) Subsets & Shrinkage Regression (Stepwise & Lasso)</a> 
 ------   
    
 ### **￡資料視覺化**  
