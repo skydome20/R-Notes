@@ -415,43 +415,66 @@ mean((xgb_y - test$lpsa)^2) # MSE
 ## 3. Stacking{#P3}
 
 
-最後要討論的 emsemble 技巧是 stacking，其概念很簡單：「在訓練多個模型、得到多個預測值/分類結果後，與其使用投票法(hard voting)或平均法(average)將這些結果整合(ensemble)起來，為何不多訓練一個模型來做這樣的整合呢？」
+最後要討論的 emsemble 技巧是 stacking，其概念很簡單：
 
-下圖展現了 stacking 的核心概念：「今天已經訓練好三個機器學習的模型，分別是 linear regression, support vector regression 跟 CART decision tree。當有一筆新資料需要預測時，會各自得到三個預測值(y1, y2, y3)，然後接下來作為最終模型(又稱 meta-model, blender, meta learner)的輸入值，得到最終預測結果(y.final)」
+「在訓練多個模型、得到多個預測值/分類結果後，與其使用投票法(hard voting)或平均法(average)將這些結果整合(ensemble)起來，為何不多訓練一個模型來做這樣的整合呢？」
+
+下圖展現了 Stacking 的核心概念：
+
+「今天已經訓練好三個機器學習的模型，分別是 linear regression, support vector regression 跟 CART decision tree。當有一筆新資料需要預測時，會各自得到三個預測值(y1, y2, y3)，然後接下來作為最終模型(又稱 meta-model, blender, meta learner)的輸入值，得到最終預測結果(y.final)」
 
 <center><img src="3.png"></img></center>
 
-這跟傳統上的做法不太一樣，我們本來可能會把(y1, y2, y3)的結果直接拿來平均(預測問題)或投票法(分類問題)，得到最後的結果；而 stacking 是用另一個模型(blender)來取代這樣的概念，換句話說，就是「把本來的預測結果再進一步做預測」。
+這跟傳統上的做法不太一樣，我們直覺上會把(y1, y2, y3)的結果直接拿來平均(預測問題)或投票法(分類問題)，得到最後的結果。
 
-因此，Stacking 的演算法可以分成兩個階段：
+不過 Stacking 採用另一個模型(blender)來取代這樣的概念。換句話說，也就是「**把本來的預測結果再進一步做預測**」的感覺。
 
-1. Stacking：先訓練多個初始模型，而這些模型的預測結果叫做  meta-data，會作為最終模型的的輸入。
+因此，Stacking 的演算法可以分成兩個階段，應該不難理解：
 
-2. Blending：最終模型會取得 meta-data ，然後整合出最後結果。
+1. Stacking：先訓練多個初始模型，其預測結果叫做  Meta-Data，作為最終模型(Meta-Model; Blender)的的輸入。
 
-以上的概念應該不難理解，不過如果你打算開始使用 stacking 的技巧來建模，想必會立刻遇到瓶頸：「咦？那我要怎麼訓練初始模型跟最終模型？並得到所謂的 meta-data？」
+2. Blending：最終模型會取得 Meta-Data ，整合出最後結果(Predicted Results)。
 
-如果是訓練初始模型，想必大家都會，因為原始資料直接丟下去訓練就可以；可是你有察覺到一個問題嗎：那要怎麼訓練第二階段的最終模型 (meta-model)呢？感覺上也需要有一筆訓練資料存在才能訓練(這樣的資料其實就是 meta-x)，會從初始模型那邊來的感覺...可是實際上是怎麼來的呢？
 
-因此整個概念會比較複雜一點，讓我們慢慢來，先看初始模型的訓練跟取得 meta-data 吧！
 
-基本上，在訓練初始模型取得 meta-data 時，會搭配類似 k-folds 的技巧，將訓練資料切割成數個子集資料(subsets)。
+不過當打算開始使用 Stacking 的技巧來建模，想必會立刻遇到瓶頸：「咦？那我要怎麼訓練初始模型跟最終模型？並得到所謂的 meta-data？」
 
-還記得上一張圖我們有三個模型嗎？這裡舉第一個模型(Linear Regression 線性迴歸)為例，假設將訓練資料(Train Data)分成三個子集資料(i.e., 3-folds)(當然不一定要三個，依情況而定。)
+如果是訓練初始模型，想必大家都會，因為原始資料直接丟下去訓練就可以。
 
-因此，從訓練資料(Train Data)中分割而出資料子集，綠色部分會用來訓練模型，紅色部分會拿來預測並取得 Predict_X；由圖中可以得知，概念就是把本來的(Train Data)，經由預測後，全轉換成 Predict_X 的狀態，這時又被稱作 Meta-X，會當成最終模型(Meta-Model)的訓練資料。
+不過現在卻有一個問題：「要怎麼訓練第二階段的最終模型 (Meta-Model) 呢？」
 
-另外，我們手中還有原始的測試資料(Test Data)，丟入模型預測後會得到 Predict (紫色部分)；但由於我們一開始把資料分成三份，所以會有三個模型，也會得到三組測試資料的預測結果，這時就會用平均法(連續問題)/投票法(分類問題)，將這三組預測結果整合起來，變成 Predict_Y 的狀態，這時又被稱作 Meta-Y，然後丟給最終模型(Meta-Model)來預測：
+感覺上，也需要有一筆訓練資料，才能訓練 Meta-Model...事實上，這樣想是對的，只不過這時的訓練資料，又稱Meta-X，會從初始模型的預測結果而來...只是怎麼來呢？
+
+所以讓我們先看初始模型的訓練，跟取得 Meta-Data(Meta-X 跟 Meta-Y) 吧！
+
+基本上，在訓練初始模型取得 Meta-Data 時，會搭配類似 K-folds 的技巧，將訓練資料切割成數個子集資料(Subsets)。
+
+在上一張圖中我們有三個模型，這裡舉第一個模型(Linear Regression 線性迴歸)為例。
+
+假設將訓練資料(Train Data)分成三個子集資料(3-folds)，當然不一定要三個，依情況而定。
+
+因此，從訓練資料(Train Data)中分割而出資料子集，綠色部分會用來訓練模型，紅色部分會拿來預測並取得 Predict_X。
+
+由圖中可以得知，概念就是把本來的(Train Data)，經由預測後，全轉換成 Predict_X 的狀態，這時又被稱作 Meta-X，會當成最終模型(Meta-Model)的訓練資料。
+
+另外，我們手中還有原始的測試資料(Test Data)，丟入模型預測後會得到 Predict (紫色部分)。
+
+但由於我們一開始把資料分成三份，所以會有三個模型，也會得到三組測試資料的預測結果，這時就直接用平均法(連續問題)/投票法(分類問題)，將這三組預測結果整合起來，變成 Predict_Y 的狀態，又被稱作 Meta-Y，並丟給最終模型(Meta-Model)來預測。
 
 
 <center><img src="4.png"></img></center>
 
-因此，當今天有多個模型時，其實需要取得各自的 Meta-X 跟 Meta-Y，當作最終模型(Meta-Model)的訓練及測試資料集(如下圖)：
+
+以上就是訓練模型時需要注意的細節。
+
+換句話說，當擁有多個模型時，我們必須各自取得每個模型的 Meta-X 跟 Meta-Y，來作為最終模型(Meta-Model)的訓練及測試資料集。
+
+因此，整個 Stacking 的概念可以用下圖表示：
 
 <center><img src="5.png"></img></center>
 
 
-以上就是 Stacking 的概念了。當然，上面示範兩階段的狀況而已。實際上在 Kaggle 比賽中，很常看見發展成三、四階段的 Stacking 模型。
+當然，上面示範兩階段的狀況而已。實際上在 Kaggle 比賽中，很常看見發展成三、四階段的 Stacking 模型。
 
 例如，在[簡言](#P0)中提及的得獎隊伍，就是使用多層階段的 Stacking 模型(同時搭配 Feature Engineering 的技巧)。
 
