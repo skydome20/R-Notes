@@ -1,4 +1,4 @@
-# R系列筆記
+## R系列筆記
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
@@ -17,13 +17,13 @@
 
 ----------
 
-# R筆記目錄
+## R筆記目錄
   
 ### **￡環境建置**   
 
 * <a href="https://skydome20.github.io/R-Notes/src/R1/R1" target="_blank">R筆記 -- (1) 安裝R與RStudio</a>   
    
-------   
+
    
 ### **￡基本觀念 & 語法**   
    
@@ -31,13 +31,13 @@
 * <a href="https://skydome20.github.io/R-Notes/src/R3/R3" target="_blank">R筆記 -- (3) 套件與函式</a>    
 * <a href="https://skydome20.github.io/R-Notes/src/R11/R11" target="_blank">R筆記 -- (11) 流程控制(for, while, ifelse, switch)</a>     
    
-------   
+  
    
 ### **￡資料處理**   
    
 * <a href="https://skydome20.github.io/R-Notes/src/R10/R10" target="_blank">R筆記 -- (10) 遺漏值處理(Impute  Missing Value)</a>   
    
-------   
+  
    
 ### **￡模型建構**  
    
@@ -50,23 +50,23 @@
 * <a href="https://skydome20.github.io/R-Notes/src/R16/R16" target="_blank">R筆記 -- (16) Ensemble Learning(集成學習)</a> 
 * <a href="https://skydome20.github.io/R-Notes/src/R17/R17" target="_blank">R筆記 -- (17) 獨立成份分析(ICA)</a> 
 * <a href="https://skydome20.github.io/R-Notes/src/R18/R18" target="_blank">R筆記 -- (18) Subsets & Shrinkage Regression (Stepwise & Lasso)</a> 
-------   
+  
    
 ### **￡資料視覺化**  
 
 * <a href="https://skydome20.github.io/R-Notes/src/R4/R4" target="_blank">R筆記 -- (4) 繪圖 -- 資料視覺化</a>   
 
-------   
+   
    
 ### **￡分散式處理**  
 
 * <a href="https://skydome20.github.io/R-Notes/src/SparkR/sparkR" target="_blank"> R筆記 -- SparkR</a>   
 
-------   
+   
    
 ### **￡文字探勘**  
    
-------  
+ 
 
    
 ### **￡Kaggle**  
@@ -74,7 +74,7 @@
 * <a href="https://skydome20.github.io/R-Notes/src/R12/R12" target="_blank">R筆記 -- (12) Digit Recognizer (深度學習–DNN, CNN)</a>   
    
    
-------  
+ 
 
    
 ### **￡其他**  
@@ -84,6 +84,8 @@
 * <a href="https://skydome20.github.io/R-Notes/src/R15/R15" target="_blank">R筆記 -- (15) Windows安裝深度學習套件：Tensorflow/Keras(R版本)</a>   
 
 ----------
+
+## Contact
 
 若筆記有任何問題或錯誤，歡迎隨時聯絡我：   
 【Email】skydome20@gmail.com   
