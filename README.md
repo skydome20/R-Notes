@@ -1,5 +1,7 @@
 # R系列筆記
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 這份筆記是用R Markdown 撰寫，再用Knitr套件編譯成Html檔案，發表到Rpubs上：   
 <a href="http://rpubs.com/skydome20/Table" target="_blank">http://rpubs.com/skydome20/Table</a>   
 
