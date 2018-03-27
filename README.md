@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-這份筆記是用R Markdown 撰寫，再用Knitr套件編譯成Html檔案，發表到Rpubs上(如果喜歡，麻煩右上按個星星！)：<a href="http://rpubs.com/skydome20/Table" target="_blank">http://rpubs.com/skydome20/Table</a>   
+這份筆記是用R Markdown 撰寫，再用Knitr套件編譯成Html檔案，發表到Rpubs上：<a href="http://rpubs.com/skydome20/Table" target="_blank">http://rpubs.com/skydome20/Table</a>   
 
 在GitHub的是R Markdown原始檔。   
 資料夾的編號和筆記的編號一致，可以去對應編號的資料夾，找尋自己想要的筆記原始檔(.Rmd)。   
