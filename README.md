@@ -17,13 +17,13 @@
 
 ## R筆記目錄
   
-### **￡環境建置**   
+### :triangular_flag_on_post:**環境建置**   
 
 * <a href="https://rpubs.com/skydome20/R1-R_and_RStudio" target="_blank">R筆記 -- (1) 安裝R與RStudio</a>   
    
 
    
-### **￡基本觀念 & 語法**   
+### :triangular_flag_on_post:**基本觀念 & 語法**   
    
 * <a href="https://rpubs.com/skydome20/R-Note2-dataType" target="_blank">R筆記 -- (2) 基本資料型態</a>     
 * <a href="https://rpubs.com/skydome20/R-Note3-function_and_package" target="_blank">R筆記 -- (3) 套件與函式</a>    
@@ -31,13 +31,13 @@
    
   
    
-### **￡資料處理**   
+### :triangular_flag_on_post:**資料處理**   
    
 * <a href="http://www.rpubs.com/skydome20/R-Note10-Missing_Value" target="_blank">R筆記 -- (10) 遺漏值處理(Impute  Missing Value)</a>   
    
   
    
-### **￡模型建構**  
+### :triangular_flag_on_post:**模型建構**  
    
 * <a href="http://rpubs.com/skydome20/R-Note5-First_Practice" target="_blank">R筆記 -- (5) 初聲試啼-簡單的資料分析(迴歸分析)</a>   
 * <a href="http://www.rpubs.com/skydome20/R-Note6-Apriori-DecisionTree" target="_blank">R筆記 -- (6) 關聯式規則；決策樹(分析鐵達尼號資料)</a>   
@@ -50,24 +50,24 @@
 * <a href="http://rpubs.com/skydome20/R-Note18-Subsets_Shrinkage_Methods" target="_blank">R筆記 -- (18) Subsets & Shrinkage Regression (Stepwise & Lasso)</a> 
   
    
-### **￡資料視覺化**  
+### :triangular_flag_on_post:**資料視覺化**  
 
 * <a href="http://rpubs.com/skydome20/R-Note4-Plotting_System" target="_blank">R筆記 -- (4) 繪圖 -- 資料視覺化</a>   
 
    
    
-### **￡分散式處理**  
+### :triangular_flag_on_post:**分散式處理**  
 
 * <a href="http://rpubs.com/skydome20/R-Note-SparkR" target="_blank"> R筆記 -- SparkR</a>   
 
    
    
-### **￡文字探勘**  
+### :triangular_flag_on_post:**文字探勘**  
    
  
 
    
-### **￡Kaggle**  
+### :triangular_flag_on_post:**Kaggle**  
 
 * <a href="http://rpubs.com/skydome20/R-Note12-DigitRecognizer-Kaggle" target="_blank">R筆記 -- (12) Digit Recognizer (深度學習–DNN, CNN)</a>   
    
@@ -75,7 +75,7 @@
  
 
    
-### **￡其他**  
+### :triangular_flag_on_post:**其他**  
 
 * <a href="http://rpubs.com/skydome20/R-Note13-Web-Crawler-on-CIA-CREST-by-xml2" target="_blank">R筆記 -- (13) 網路爬蟲(Crawler)：用xml2爬美國中情局(CIA)的解密文件資料庫</a>   
    
