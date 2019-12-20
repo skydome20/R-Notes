@@ -63,7 +63,7 @@
    
 ### :triangular_flag_on_post:**Kaggle**  
 
-* <a href="http://rpubs.com/skydome20/R-Note12-DigitRecognizer-Kaggle" target="_blank">R筆記 -- (12) Digit Recognizer (深度學習–DNN, CNN)</a>   
+* <a href="https://htmlpreview.github.io/?https://github.com/skydome20/R-Notes/blob/master/src/R12/R12.html" target="_blank">R筆記 -- (12) Digit Recognizer (深度學習–DNN, CNN)</a>   
    
    
  
